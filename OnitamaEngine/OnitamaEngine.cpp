@@ -146,7 +146,7 @@ void OnitamaEngine::InitAllCards()
     c16.AddJumpOption(Point2D(1, 1));
 
 
-    _allCards = std::vector<Card>();
+    std::vector<Card>_allCards = std::vector<Card>();
     _allCards.push_back(c01);
     _allCards.push_back(c02);
     _allCards.push_back(c03);
@@ -167,5 +167,125 @@ void OnitamaEngine::InitAllCards()
 }
 
 
+bool OnitamaEngine::_validateMove(bool inIsPlayerRed, std::string inCardName, Point2D inFigureStartPosition, Point2D inFigureEndPosition)
+{
+    if (!_isOnBoard(inFigureStartPosition))
+    {
+        return false;
+    }
+    if(!_hasOwnPiece(inIsPlayerRed,inFigureStartPosition))
+    {
+        return false;
+    }
+    if (!_checkIfCardExists(inCardName))
+    {
+        return false;
+    }
+    if (!_isOnBoard(inFigureEndPosition))
+    {
+        return false;
+    }
+    Card usedCard = _getCard(inCardName);
+    std::vector<Point2D> jumpOptions = usedCard.GetJumpOptions(inIsPlayerRed);
+    std::vector<Point2D> endPositionOptions = 
+        _calculateJumpEndOptions(inFigureStartPosition,jumpOptions);
 
+}
+
+bool OnitamaEngine::_checkIfCardExists(std::string inCardName)
+{
+    for (int i = 0; i < _allCards.size(); i++)
+    {
+        if (_allCards[i].GetName() == inCardName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+Card OnitamaEngine::_getCard(std::string inCardName)
+{
+    for (int i = 0; i < _allCards.size(); i++)
+    {
+        if (_allCards[i].GetName() == inCardName)
+        {
+            return _allCards[i];
+        }
+    }
+    return Card("HÄBÄDÄBÄDÄH!",true);
+}
+
+std::vector<Point2D> OnitamaEngine::_calculateJumpEndOptions(Point2D inFigureStartPosition, std::vector<Point2D> jumpOptions)
+{
+    std::vector<Point2D> ret = std::vector<Point2D>();
+    for (int i = 0; i < jumpOptions.size(); i++)
+    {
+        int endPositionX = inFigureStartPosition.X + jumpOptions[i].X;
+        int endPositionY = inFigureStartPosition.Y + jumpOptions[i].Y;
+        ret.push_back(Point2D(endPositionX, endPositionY));
+    }
+    return ret;
+}
+
+bool OnitamaEngine::_isOnBoard(Point2D inPoint)
+{
+    if (inPoint.X < 0 || 
+        inPoint.X > boardSize - 1 ||
+        inPoint.Y < 0 ||
+        inPoint.Y > boardSize - 1)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+
+bool OnitamaEngine::_hasOwnPiece(bool inIsPlayerRed, Point2D inPoint)
+{
+    char pieceOnPoint = _currentBoardState[inPoint.Y][inPoint.X];
+    char ownDisciple;
+    char ownMaster;
+    if (inIsPlayerRed)
+    {
+        ownDisciple = _redDisciple;
+        ownMaster = _redMaster;
+    }
+    else
+    {
+        ownDisciple = _blueDisciple;
+        ownMaster = _blueMaster;
+    }
+    if (pieceOnPoint != ownDisciple && pieceOnPoint != ownMaster)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool OnitamaEngine::_validateEndPositionOptions(bool inIsRedPlayer, std::vector<Point2D> inEndPositionOptions, Point2D inFigureEndPosition)
+{
+    if (!_isOnBoard(inFigureEndPosition))
+    {
+        return false;
+    }
+    if (_hasOwnPiece(inIsRedPlayer,inFigureEndPosition))
+    {
+        return false;
+    }
+    for (int i = 0; i < inEndPositionOptions.size(); i++)
+    {
+        if (inFigureEndPosition == inEndPositionOptions[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
 

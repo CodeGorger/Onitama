@@ -10,4 +10,15 @@ struct Point2D
 	int Y;
 };
 
+bool static inline operator== (Point2D first, Point2D second)
+{
+	if ((first.X == second.X) && (first.Y == second.Y))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 #endif
