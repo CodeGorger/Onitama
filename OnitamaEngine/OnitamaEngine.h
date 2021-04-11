@@ -13,9 +13,9 @@ private:
     static const char _blueMaster = 'B';
     static const char _redDisciple = 'r';
     static const char _redMaster = 'R';
-    static const int boardSize = 5;
+    static const int _boardSize = 5;
 
-    // _currentBoardState inited as:
+    // _currentBoardState represents the board as a human would understand it
     // 5 bbBbb
     // 4 .....
     // 3 .....
@@ -23,23 +23,95 @@ private:
     // 1 rrRrr
     //   ABCDE
     std::vector<std::vector<char>> _currentBoardState;
-    void _initBoard();
 
+    // _currentCardsRed is a list of index of
+    // the cards that the red player has available
     std::vector<unsigned int> _currentCardsRed;
+
+    // _currentCardsRed is a list of index of
+    // the cards that the blue player has available
     std::vector<unsigned int> _currentCardsBlue;
+
+    // _currentCardCenter is the card that lays in the center
     unsigned int _currentCardCenter;
 
+    // _allCards contains all available cards.
     std::vector<Card> _allCards;
-    std::vector<Card> _getRandomCards(int inAmount);
-    bool _validateMove(bool inIsPlayerRed, std::string inCardName, Point2D inFigureStartPosition, Point2D inFigureEndPosition);
-    Card _getCard(std::string inCardName);
+
+    // _initBoard() will initialize _currentBoardState
+    void _initBoard();
+
+    // _initAllCards() will initialize _allCards
+    void _initAllCards();
+
+    // _getRandomCards() will return a random subset of 
+    // size inAmount from _allCards
+    std::vector<Card> _getRandomCards(unsigned int inAmount);
+
+    // _validateMove will return true if the given parameter
+    // for a move is legal, else false
+    // So what happens is:
+    // 1. Abort if the start position of the move isn't even on the board
+    // 2. Abort if the player doesn't have a figure at the start position
+    // 3. Abort if the card doesn't even exist
+    // 4. Abort if the player doesn't own such a card
+    // 5. Abort if the final position isn't even on the board
+    // 6. Abort if the final position is already occupied by an own figure
+    // 7. Abort if the card would allow to jump to the given end position
+    // All checks passed, seems ok, return true...
+    bool _validateMove(
+        bool inIsPlayerRed, 
+        std::string inCardName, 
+        Point2D inFigureStartPosition, 
+        Point2D inFigureEndPosition);
+
+    // _checkIfCardExists will return 
+    // true: if _allCards has a card called inCardName
+    // false: if _allCards does not have a card called inCardName
     bool _checkIfCardExists(std::string inCardName);
-    std::vector<Point2D> _calculateJumpEndOptions(Point2D inFigureStartPosition, std::vector<Point2D> jumpOptions);
+
+    // _checkIfPlayerOwnsCard will return 
+    // true: if inCardName is in _currentCardsRed
+    //       (or _currentCardsBlue, depending on inIsPlayerRed)
+    bool _checkIfPlayerOwnsCard(
+        bool inIsPlayerRed,
+        std::string inCardName);
+
+    Card _getCard(std::string inCardName);
+
+    // _calculateJumpEndOptions will take each inJumpOptions entry
+    // add inFigureStartPosition onto them and give them back.
+    // These will basically reflect all points a figure can jump
+    // to with a card.
+    std::vector<Point2D> _calculateJumpEndOptions(
+        Point2D inFigureStartPosition, 
+        std::vector<Point2D> inJumpOptions);
+
+    // _isOnBoard will take inPoint and return
+    // true: if it is within the measurements of the board
     bool _isOnBoard(Point2D inPoint);
-    bool _hasOwnPiece(bool inIsPlayerRed, Point2D inPoint);
-    bool _validateEndPositionOptions(bool inIsRedPlayer, std::vector<Point2D> inEndPositionOptions, Point2D inFigureEndPosition);
-public:
-    void InitAllCards();
+
+    // _hasOwnPieceAtLocation will check _currentBoardState
+    // for a figure of type red (or blue, depending on inIsPlayerRed)
+    bool _hasOwnPieceAtLocation(
+        bool inIsPlayerRed, 
+        Point2D inPoint);
+
+    // _endpointIsInEndPositionOptions will consider all calculated
+    // endpoint options and if one is equal to inFigureEndPosition
+    // it will return true
+    bool _endpointIsInEndPositionOptions(
+        std::vector<Point2D> inEndPositionOptions, 
+        Point2D inFigureEndPosition);
+    
+    // _cardHasEndpositionAsOption will get the card, take all jumpoptions
+    // calculate the endpoints and 
+    bool _cardHasEndpositionAsOption(
+        bool inIsPlayerRed,
+        std::string inCardName,
+        Point2D inFigureStartPosition,
+        Point2D inFigureEndPosition);
+
 };
 
     //void _rejectMove();
