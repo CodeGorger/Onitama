@@ -5,6 +5,7 @@
 #include "Card.h"
 #include <time.h>
 #include <cstdlib>
+#include "MoveInformation.h"
 
 class OnitamaEngine
 {
@@ -38,6 +39,11 @@ private:
     // _allCards contains all available cards.
     std::vector<Card> _allCards;
 
+    // _engineState will contain a message in case of an event
+    std::string _engineState;
+
+    bool _isRedsTurn;
+
     // _initBoard() will initialize _currentBoardState
     void _initBoard();
 
@@ -47,23 +53,6 @@ private:
     // _getRandomCards() will return a random subset of 
     // size inAmount from _allCards
     std::vector<Card> _getRandomCards(unsigned int inAmount);
-
-    // _validateMove will return true if the given parameter
-    // for a move is legal, else false
-    // So what happens is:
-    // 1. Abort if the start position of the move isn't even on the board
-    // 2. Abort if the player doesn't have a figure at the start position
-    // 3. Abort if the card doesn't even exist
-    // 4. Abort if the player doesn't own such a card
-    // 5. Abort if the final position isn't even on the board
-    // 6. Abort if the final position is already occupied by an own figure
-    // 7. Abort if the card would allow to jump to the given end position
-    // All checks passed, seems ok, return true...
-    bool _validateMove(
-        bool inIsPlayerRed, 
-        std::string inCardName, 
-        Point2D inFigureStartPosition, 
-        Point2D inFigureEndPosition);
 
     // _checkIfCardExists will return 
     // true: if _allCards has a card called inCardName
@@ -108,10 +97,26 @@ private:
     // calculate the endpoints and 
     bool _cardHasEndpositionAsOption(
         bool inIsPlayerRed,
-        std::string inCardName,
-        Point2D inFigureStartPosition,
-        Point2D inFigureEndPosition);
+        MoveInformation inMove);
 
+public:
+    // _validateMove will return true if the given parameter
+    // for a move is legal, else false
+    // So what happens is:
+    // 1. Abort if the start position of the move isn't even on the board
+    // 2. Abort if the player doesn't have a figure at the start position
+    // 3. Abort if the card doesn't even exist
+    // 4. Abort if the player doesn't own such a card
+    // 5. Abort if the final position isn't even on the board
+    // 6. Abort if the final position is already occupied by an own figure
+    // 7. Abort if the card would allow to jump to the given end position
+    // All checks passed, seems ok, return true...
+    bool ValidateMove(
+        bool inIsPlayerRed,
+        MoveInformation inMove);
+
+
+    void ApplyMove(MoveInformation inMove);
 };
 
     //void _rejectMove();

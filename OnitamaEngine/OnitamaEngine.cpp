@@ -168,46 +168,6 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
 
 
 
-bool OnitamaEngine::_validateMove(
-    bool inIsPlayerRed, 
-    std::string inCardName, 
-    Point2D inFigureStartPosition, 
-    Point2D inFigureEndPosition)
-{
-    if (!_isOnBoard(inFigureStartPosition))
-    {
-        return false;
-    }
-    if(!_hasOwnPieceAtLocation(inIsPlayerRed,inFigureStartPosition))
-    {
-        return false;
-    }
-    if (!_checkIfCardExists(inCardName))
-    {
-        return false;
-    }
-    if (!_checkIfPlayerOwnsCard(inIsPlayerRed, inCardName))
-    {
-        return false;
-    }
-    if (!_isOnBoard(inFigureEndPosition))
-    {
-        return false;
-    }
-    if (_hasOwnPieceAtLocation(inIsPlayerRed, inFigureEndPosition))
-    {
-        return false;
-    }
-    if (_cardHasEndpositionAsOption(
-            inIsPlayerRed,
-            inCardName,
-            inFigureStartPosition,
-            inFigureEndPosition))
-    {
-        return false;
-    }
-    return true;
-}
 
 bool OnitamaEngine::_checkIfCardExists(std::string inCardName)
 {
@@ -330,17 +290,89 @@ bool OnitamaEngine::_endpointIsInEndPositionOptions(
 
 bool OnitamaEngine::_cardHasEndpositionAsOption(
     bool inIsPlayerRed,
-    std::string inCardName,
-    Point2D inFigureStartPosition,
-    Point2D inFigureEndPosition)
+    MoveInformation inMove)
 {
-    Card usedCard = _getCard(inCardName);
+    Card usedCard = _getCard(inMove.getCardName());
     std::vector<Point2D> jumpOptions =
         usedCard.GetJumpOptions(inIsPlayerRed);
     std::vector<Point2D> endPositionOptions =
-        _calculateJumpEndOptions(inFigureStartPosition, jumpOptions);
+        _calculateJumpEndOptions(inMove.getFigureStartPosition(), jumpOptions);
 
     return _endpointIsInEndPositionOptions(
         endPositionOptions,
-        inFigureEndPosition);
+        inMove.getFigureEndPosition());
+}
+
+
+
+
+
+bool OnitamaEngine::ValidateMove(
+    bool inIsPlayerRed,
+    MoveInformation inMove)
+{
+    std::string cardName = inMove.getCardName();
+    Point2D figureStartPosition = inMove.getFigureStartPosition();
+    Point2D figureEndPosition = inMove.getFigureEndPosition();
+
+    if (!_isOnBoard(figureStartPosition))
+    {
+        _engineState = "The start point isn't on the game board (";
+        _engineState += figureStartPosition.ToChessString() + ").";
+        return false;
+    }
+    if (!_hasOwnPieceAtLocation(inIsPlayerRed, figureStartPosition))
+    {
+        _engineState = "No piece of player ";
+        _engineState += ((inIsPlayerRed) ? "red" : "blue");
+        _engineState += " found at start point (";
+        _engineState += figureStartPosition.ToChessString() + ").";
+        return false;
+    }
+    if (!_checkIfCardExists(cardName))
+    {
+        _engineState = "The cardname ";
+        _engineState += cardName;
+        _engineState += " wasn't found at all.";
+        return false;
+    }
+    if (!_checkIfPlayerOwnsCard(inIsPlayerRed, cardName))
+    {
+        _engineState = "The player ";
+        _engineState += ((inIsPlayerRed) ? "red" : "blue");
+        _engineState += " doesn't have the card ";
+        _engineState += cardName;
+        _engineState += ".";
+        return false;
+    }
+    if (!_isOnBoard(figureEndPosition))
+    {
+        _engineState = "The end point isn't on the board (";
+        _engineState += figureEndPosition.ToChessString() + ").";
+        return false;
+    }
+    if (_hasOwnPieceAtLocation(inIsPlayerRed, figureEndPosition))
+    {
+        _engineState = "The end point is already occupied by a piece of player(";
+        _engineState += ((inIsPlayerRed) ? "red" : "blue");
+        _engineState += ".";
+        return false;
+    }
+    if (_cardHasEndpositionAsOption(
+        inIsPlayerRed, inMove))
+    {
+        _engineState = "The choosen card (" + cardName;
+        _engineState += ") doesn't allow a jump from ";
+        _engineState += figureStartPosition.ToChessString() + " to ";
+        _engineState += figureEndPosition.ToChessString() + ".";
+        return false;
+    }
+    return true;
+}
+
+
+
+void OnitamaEngine::ApplyMove(MoveInformation inMove)
+{
+
 }

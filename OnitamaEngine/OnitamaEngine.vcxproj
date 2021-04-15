@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="OnitamaEngine.cpp" />
+    <ClCompile Include="MoveInformation.cpp" />
     <ClCompile Include="start.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
+    <ClInclude Include="MoveInformation.h" />
     <ClInclude Include="OnitamaEngine.h" />
     <ClInclude Include="Point2D.h" />
   </ItemGroup>

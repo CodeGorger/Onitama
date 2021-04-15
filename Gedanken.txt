@@ -1,0 +1,110 @@
+
+
+
+
+Validieren erlaubter Spielzüge
+Spiel Ende (Abwickelung der Siegerkürung; Abwickelung der Verbindung)
+
+
+
+
+1. Schach notation (für Onitama): TIGER:H5G4
+2. Zobrist
+
+FigurenState_Option1=
+[[[11011], // Alle Blauen Schüler
+  [00000],
+  [00000],
+  [00000],
+  [00000]],
+ 
+ [[00100], // Blauer Meister
+  [00000],
+  [00000],
+  [00000],
+  [00000]],
+ 
+ [[00000], // Alle Roten Schüler
+  [00000],
+  [00000],
+  [00000],
+  [11011]],
+ 
+ [[00000], // Roter Meister
+  [00000],
+  [00000],
+  [00000],
+  [00100]]]
+
+
+
+FigurenState_Option2=
+[[[11111], // Alle Blauen
+  [00000],
+  [00000],
+  [00000],
+  [00000]],
+ 
+ [[00000], // Alle Roten
+  [00000],
+  [00000],
+  [00000],
+  [11111]],
+  
+ [[00100], // Alle Meister
+  [00000],
+  [00000],
+  [00000],
+  [00100]],
+ 
+ [[11011], // Alle Schueler
+  [00000],
+  [00000],
+  [00000],
+  [11011]]]
+
+CardState=
+[[000000000101], // Karten von Rot
+ [000000010000], // Karte in der Mitte
+ [100010000000]] // Karten von Blau
+
+
+CardOptions=
+[[[00000], // Cobra Me
+  [00010],
+  [01X00],
+  [00010],
+  [00000]],
+ [[00000], // Boar Me
+  [00000],
+  [00X00],
+  [00000],
+  [00000]],
+ [[00000], // Ox Me
+  [00000],
+  [00X00],
+  [00000],
+  [00000]],
+ [[00000], // Tiger Me
+  [00000],
+  [00X00],
+  [00000],
+  [00000]],
+ [[00000], // Drache Me
+  [00000],
+  [00X00],
+  [00000],
+  [00000]]
+  ]
+  
+  
+Experiment Idee:
+	(a) Netz mit CardState laufen lassen
+	(b) Netz mit CardOption laufen lassen
+	a vs b antreten lassen
+	Neues Tier hinzufügen & dann schauen wie konkurrenzfähig ist b ungelernt gegen Mensch bzw. wie lange braucht es um weiter zu lernen
+	
+	
+
+
+
