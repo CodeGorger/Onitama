@@ -115,8 +115,9 @@ public:
         bool inIsPlayerRed,
         MoveInformation inMove);
 
-
     void ApplyMove(MoveInformation inMove);
+
+    OnitamaEngine();
 };
 
     //void _rejectMove();

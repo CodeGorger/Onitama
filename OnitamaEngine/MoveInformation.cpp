@@ -1,6 +1,8 @@
 
 #include "MoveInformation.h"
 
+
+//TODO(Simon): Schreiben
 bool MoveInformation::ParseMove(std::string inTcpMove)
 {
 	if (inTcpMove.size() > 20)
@@ -17,9 +19,7 @@ bool MoveInformation::ParseMove(std::string inTcpMove)
 
 	_figureEndPosition.ParseFromChessString(
 		inTcpMove.substr(indexOfFirstSemicolon+2, 2));
-	
-	//TODO(Simon): Mal überlegen ob es nicht cooler wäre wenn
-	//			   
+				   
 
 	_isInitialized = true;
 }

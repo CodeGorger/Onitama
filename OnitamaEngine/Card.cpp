@@ -14,7 +14,7 @@ Card::Card(std::string inName, bool inIsRedStartPlayer)
 void Card::AddJumpOption(Point2D inOption)
 {
 	_jumpOffsetOption.push_back(inOption);
-	_jumpOffsetOptionRotated.push_back(Point2D(-1*inOption.X,-1*inOption.Y));
+	_jumpOffsetOptionRotated.push_back(inOption.GetRotated());
 }
 
 std::string Card::GetName()

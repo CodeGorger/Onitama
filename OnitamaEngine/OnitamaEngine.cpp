@@ -224,19 +224,17 @@ std::vector<Point2D> OnitamaEngine::_calculateJumpEndOptions(
     std::vector<Point2D> ret = std::vector<Point2D>();
     for (unsigned int i = 0; i < inJumpOptions.size(); i++)
     {
-        int endPositionX = inFigureStartPosition.X + inJumpOptions[i].X;
-        int endPositionY = inFigureStartPosition.Y + inJumpOptions[i].Y;
-        ret.push_back(Point2D(endPositionX, endPositionY));
+        ret.push_back(inFigureStartPosition+inJumpOptions[i]);
     }
     return ret;
 }
 
 bool OnitamaEngine::_isOnBoard(Point2D inPoint)
 {
-    if (inPoint.X < 0 || 
-        inPoint.X > _boardSize - 1 ||
-        inPoint.Y < 0 ||
-        inPoint.Y > _boardSize - 1)
+    if (inPoint.GetX() < 0 || 
+        inPoint.GetX() > _boardSize - 1 ||
+        inPoint.GetY() < 0 ||
+        inPoint.GetY() > _boardSize - 1)
     {
         return false;
     }
@@ -251,7 +249,7 @@ bool OnitamaEngine::_hasOwnPieceAtLocation(
     bool inIsPlayerRed, 
     Point2D inPoint)
 {
-    char pieceOnPoint = _currentBoardState[inPoint.Y][inPoint.X];
+    char pieceOnPoint = _currentBoardState[inPoint.GetY()][inPoint.GetX()];
     char ownDisciple;
     char ownMaster;
     if (inIsPlayerRed)
@@ -292,15 +290,15 @@ bool OnitamaEngine::_cardHasEndpositionAsOption(
     bool inIsPlayerRed,
     MoveInformation inMove)
 {
-    Card usedCard = _getCard(inMove.getCardName());
+    Card usedCard = _getCard(inMove.GetCardName());
     std::vector<Point2D> jumpOptions =
         usedCard.GetJumpOptions(inIsPlayerRed);
     std::vector<Point2D> endPositionOptions =
-        _calculateJumpEndOptions(inMove.getFigureStartPosition(), jumpOptions);
+        _calculateJumpEndOptions(inMove.GetFigureStartPosition(), jumpOptions);
 
     return _endpointIsInEndPositionOptions(
         endPositionOptions,
-        inMove.getFigureEndPosition());
+        inMove.GetFigureEndPosition());
 }
 
 
@@ -311,9 +309,9 @@ bool OnitamaEngine::ValidateMove(
     bool inIsPlayerRed,
     MoveInformation inMove)
 {
-    std::string cardName = inMove.getCardName();
-    Point2D figureStartPosition = inMove.getFigureStartPosition();
-    Point2D figureEndPosition = inMove.getFigureEndPosition();
+    std::string cardName = inMove.GetCardName();
+    Point2D figureStartPosition = inMove.GetFigureStartPosition();
+    Point2D figureEndPosition = inMove.GetFigureEndPosition();
 
     if (!_isOnBoard(figureStartPosition))
     {
@@ -375,4 +373,11 @@ bool OnitamaEngine::ValidateMove(
 void OnitamaEngine::ApplyMove(MoveInformation inMove)
 {
 
+}
+
+
+OnitamaEngine::OnitamaEngine()
+{
+    _initBoard();
+    _initAllCards();
 }

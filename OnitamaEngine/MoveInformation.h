@@ -33,9 +33,9 @@ public:
     // inTcpMove e.g. "TIGER;A1A3"
     bool ParseMove(std::string inTcpMove);
 
-    Point2D getFigureStartPosition();
-    Point2D getFigureEndPosition();
-    std::string getCardName();
+    Point2D GetFigureStartPosition() { return _figureStartPosition; }
+    Point2D GetFigureEndPosition() { return _figureEndPosition; }
+    std::string GetCardName() { return _cardName; }
 
 };
 

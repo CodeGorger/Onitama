@@ -1,64 +1,33 @@
 #ifndef _POINT2D_H_
 #define _POINT2D_H_
 
+#include <string>
 
-struct Point2D
+class Point2D
 {
+private:
+	int _x;
+	int _y;
+
+	bool _isEqual(Point2D rhs) const;
+	Point2D _add(Point2D rhs) const;
+
+public:
 	Point2D(int inX, int inY)
-		:X(inX), Y(inY) {}
-	int X;
-	int Y;
+		:_x(inX), _y(inY) {}
 
 	std::string ToXyString();
 	std::string ToChessString();
 	bool ParseFromChessString(std::string inChessFormattedMove);
+	Point2D GetRotated();
+
+	bool operator== (Point2D second) const;
+	Point2D operator+ (Point2D second) const;
+
+	int GetX() { return _x; }
+	int GetY() { return _y; }
+	
 };
 
-bool static inline operator== (Point2D first, Point2D second)
-{
-	if ((first.X == second.X) && (first.Y == second.Y))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-std::string Point2D::ToXyString()
-{
-	return std::string(std::to_string(X)+";"+std::to_string(Y));
-}
-
-std::string Point2D::ToChessString()
-{
-	return std::string(('A' + X) + ";" + std::to_string(Y));
-}
-
-bool Point2D::ParseFromChessString(std::string inChessFormattedMove)
-{
-	if (inChessFormattedMove.size() != 2)
-	{
-		//"Chess notation has exactly string length 2 (not "
-		// + inChessFormattedMove.length() + ")."
-		return false;
-	}
-	if (inChessFormattedMove[0] < 'A' || 'E' < inChessFormattedMove[0])
-	{
-		//"The x location must be between A and E (is "
-		// + inChessFormattedMove[0] + ")."
-		return false;
-	}
-	if (inChessFormattedMove[1] < '1' || '5' < inChessFormattedMove[1])
-	{
-		//"The x location must be between 1 and 5 (is "
-		// + inChessFormattedMove[0] + ")."
-		return false;
-	}
-	X = inChessFormattedMove[0] - 'A';
-	Y = inChessFormattedMove[1] - '0';
-	return true;
-}
 
 #endif
