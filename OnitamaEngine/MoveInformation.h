@@ -16,15 +16,27 @@ public:
         std::string inCardName, 
         Point2D inFigureStartPosition, 
         Point2D inFigureEndPosition)
-    : _cardName(inCardName)
+        : _cardName(inCardName)
         , _figureStartPosition(inFigureStartPosition)
         , _figureEndPosition(inFigureEndPosition)
         , _isInitialized(true)
     {}
 
+    MoveInformation(std::string inMoveString)
+        : _cardName("")
+        , _figureStartPosition(Point2D(0, 0))
+        , _figureEndPosition(Point2D(0, 0))
+        , _isInitialized(false)
+    {
+        if (ParseMove(inMoveString))
+        {
+            _isInitialized = true;
+        }
+    }
+
     MoveInformation()
         : _cardName("")
-        , _figureStartPosition(Point2D(0,0))
+        , _figureStartPosition(Point2D(0, 0))
         , _figureEndPosition(Point2D(0, 0))
         , _isInitialized(false)
     {}

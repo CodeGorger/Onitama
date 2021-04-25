@@ -1,12 +1,21 @@
 
 #include "OnitamaEngine.h"
+#include "MoveValidator.h"
+
+#include <algorithm>
+#include <random>
+#include <iostream>
+
+#include <pybind11/pybind11.h>
 
 void OnitamaEngine::_initBoard()
 {
     _currentBoardState = std::vector<std::vector<char>>();
     _currentBoardState.push_back(
         {
-            _blueDisciple, _blueDisciple, _blueMaster, _blueDisciple, _blueDisciple
+            _redDisciple, _redDisciple,
+            _redMaster,
+            _redDisciple, _redDisciple
         });
     _currentBoardState.push_back(
         {
@@ -22,7 +31,9 @@ void OnitamaEngine::_initBoard()
         });
     _currentBoardState.push_back(
         {
-            _redDisciple, _redDisciple, _redMaster, _redDisciple, _redDisciple
+            _blueDisciple, _blueDisciple,
+            _blueMaster,
+            _blueDisciple, _blueDisciple
         });
 }
 
@@ -36,7 +47,7 @@ void OnitamaEngine::_initAllCards()
     c02.AddJumpOption(Point2D(1, -1));
     c02.AddJumpOption(Point2D(2, 1));
     c02.AddJumpOption(Point2D(-1, -1));
-    c02.AddJumpOption(Point2D(-1, 1));
+    c02.AddJumpOption(Point2D(-2, 1));
 
     Card c03 = Card("Frog", true);
     c03.AddJumpOption(Point2D(-1, 1));
@@ -49,7 +60,7 @@ void OnitamaEngine::_initAllCards()
     c04.AddJumpOption(Point2D(-1, -1));
 
     Card c05 = Card("Crab", false);
-    c05.AddJumpOption(Point2D(1, 0));
+    c05.AddJumpOption(Point2D(0, 1));
     c05.AddJumpOption(Point2D(-2, 0));
     c05.AddJumpOption(Point2D(2, 0));
 
@@ -78,9 +89,9 @@ void OnitamaEngine::_initAllCards()
     c09.AddJumpOption(Point2D(1, -1));
 
     Card c10 = Card("Mantis", true);
-    c10.AddJumpOption(Point2D(1, -1));
-    c10.AddJumpOption(Point2D(0, -1));
+    c10.AddJumpOption(Point2D(1, 1));
     c10.AddJumpOption(Point2D(-1, 1));
+    c10.AddJumpOption(Point2D(0, -1));
 
     Card c11 = Card("Horse", true);
     c11.AddJumpOption(Point2D(0, 1));
@@ -93,19 +104,19 @@ void OnitamaEngine::_initAllCards()
     c12.AddJumpOption(Point2D(0, -1));
 
     Card c13 = Card("Crane", false);
-    c13.AddJumpOption(Point2D(1, 0));
-    c13.AddJumpOption(Point2D(-1, 1));
+    c13.AddJumpOption(Point2D(1, -1));
+    c13.AddJumpOption(Point2D(0, 1));
     c13.AddJumpOption(Point2D(-1, -1));
 
     Card c14 = Card("Boar", true);
     c14.AddJumpOption(Point2D(1, 0));
+    c14.AddJumpOption(Point2D(-1, 0));
     c14.AddJumpOption(Point2D(0, 1));
-    c14.AddJumpOption(Point2D(0, -1));
 
     Card c15 = Card("Eel", false);
     c15.AddJumpOption(Point2D(-1, 1));
     c15.AddJumpOption(Point2D(-1, -1));
-    c15.AddJumpOption(Point2D(1, 1));
+    c15.AddJumpOption(Point2D(1, 0));
 
     Card c16 = Card("Cobra", true);
     c16.AddJumpOption(Point2D(-1, 0));
@@ -113,7 +124,7 @@ void OnitamaEngine::_initAllCards()
     c16.AddJumpOption(Point2D(1, 1));
 
 
-    std::vector<Card>_allCards = std::vector<Card>();
+    _allCards = std::vector<Card>();
     _allCards.push_back(c01);
     _allCards.push_back(c02);
     _allCards.push_back(c03);
@@ -133,10 +144,40 @@ void OnitamaEngine::_initAllCards()
 
 }
 
+void OnitamaEngine::_initPlayers()
+{
+    pybind11::print("Py OnitamaEngine::_initPlayers");
+    _currentCardsRed = std::vector<Card>();
+    _currentCardsBlue = std::vector<Card>();
+
+    pybind11::print("Py _getRandomCards(5)");
+    std::vector<Card> c = _getRandomCards(5);
+    if (5 > c.size())
+    {
+        _engineStatus = "Couldn't find 5 Cards";
+        return;
+    }
+
+    pybind11::print("Py (5 <= c.size())");
+    _currentCardsRed.push_back(c[0]);
+    _currentCardsRed.push_back(c[1]);
+    _currentCardsBlue.push_back(c[2]);
+    _currentCardsBlue.push_back(c[3]);
+    _currentCardCenter = c[4];
+    _isRedsTurn = _currentCardCenter.IsRedStartPlayer();
+}
+
 std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
 {
-    if (0 == inAmount)
+    if (0 == _allCards.size())
     {
+        pybind11::print("Py _initAllCards()");
+        _initAllCards();
+    }
+
+    if (0 == inAmount || 0 == _allCards.size())
+    {
+        pybind11::print("Py (0 == inAmount || 0 == _allCards.size())");
         return std::vector<Card>();
     }
 
@@ -148,12 +189,19 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
     }
     // randomIds := { 0, 1, 2, ..., 15, 16 }
 
+
     // Approaching backwards, removing until required amount is given
     srand((unsigned int)time(NULL));
+    pybind11::print("Py srand((unsigned int)time(NULL))");
 
     while (randomIds.size() > inAmount)
     {
-        int tmpRandomId = rand() % _allCards.size();
+        pybind11::print("(randomIds.size() > inAmount)", randomIds.size(), inAmount);
+
+        int rnd = rand();
+
+        int tmpRandomId = rnd % randomIds.size();
+        pybind11::print("rand, randId ", rnd, tmpRandomId);
         randomIds.erase(randomIds.begin() + tmpRandomId);
     }
 
@@ -162,146 +210,13 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
     {
         ret.push_back(_allCards[randomIds[i]]);
     }
+    pybind11::print("Py ret.push_back(_allCards[randomIds[i]]);");
+
+    auto rng = std::default_random_engine{};
+    std::shuffle(std::begin(ret), std::end(ret), rng);
+    
     return ret;
 }
-
-
-
-
-
-bool OnitamaEngine::_checkIfCardExists(std::string inCardName)
-{
-    for (unsigned int i = 0; i < _allCards.size(); i++)
-    {
-        if (_allCards[i].GetName() == inCardName)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool OnitamaEngine::_checkIfPlayerOwnsCard(
-    bool inIsPlayerRed,
-    std::string inCardName)
-{
-    std::vector<unsigned int> playersCards;
-    if (inIsPlayerRed)
-    {
-        playersCards = _currentCardsRed;
-    }
-    else
-    {
-        playersCards = _currentCardsBlue;
-    }
-
-    for (unsigned int i = 0; i < playersCards.size(); i++)
-    {
-        if (_allCards[playersCards[i]].GetName() == inCardName)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-Card OnitamaEngine::_getCard(std::string inCardName)
-{
-    for (unsigned int i = 0; i < _allCards.size(); i++)
-    {
-        if (_allCards[i].GetName() == inCardName)
-        {
-            return _allCards[i];
-        }
-    }
-    return Card("HÄBÄDÄBÄDÄH!",true);
-}
-
-std::vector<Point2D> OnitamaEngine::_calculateJumpEndOptions(
-    Point2D inFigureStartPosition, 
-    std::vector<Point2D> inJumpOptions)
-{
-    std::vector<Point2D> ret = std::vector<Point2D>();
-    for (unsigned int i = 0; i < inJumpOptions.size(); i++)
-    {
-        ret.push_back(inFigureStartPosition+inJumpOptions[i]);
-    }
-    return ret;
-}
-
-bool OnitamaEngine::_isOnBoard(Point2D inPoint)
-{
-    if (inPoint.GetX() < 0 || 
-        inPoint.GetX() > _boardSize - 1 ||
-        inPoint.GetY() < 0 ||
-        inPoint.GetY() > _boardSize - 1)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-
-bool OnitamaEngine::_hasOwnPieceAtLocation(
-    bool inIsPlayerRed, 
-    Point2D inPoint)
-{
-    char pieceOnPoint = _currentBoardState[inPoint.GetY()][inPoint.GetX()];
-    char ownDisciple;
-    char ownMaster;
-    if (inIsPlayerRed)
-    {
-        ownDisciple = _redDisciple;
-        ownMaster = _redMaster;
-    }
-    else
-    {
-        ownDisciple = _blueDisciple;
-        ownMaster = _blueMaster;
-    }
-    if (pieceOnPoint != ownDisciple && pieceOnPoint != ownMaster)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-bool OnitamaEngine::_endpointIsInEndPositionOptions(
-    std::vector<Point2D> inEndPositionOptions, 
-    Point2D inFigureEndPosition)
-{
-    for (unsigned int i = 0; i < inEndPositionOptions.size(); i++)
-    {
-        if (inFigureEndPosition == inEndPositionOptions[i])
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool OnitamaEngine::_cardHasEndpositionAsOption(
-    bool inIsPlayerRed,
-    MoveInformation inMove)
-{
-    Card usedCard = _getCard(inMove.GetCardName());
-    std::vector<Point2D> jumpOptions =
-        usedCard.GetJumpOptions(inIsPlayerRed);
-    std::vector<Point2D> endPositionOptions =
-        _calculateJumpEndOptions(inMove.GetFigureStartPosition(), jumpOptions);
-
-    return _endpointIsInEndPositionOptions(
-        endPositionOptions,
-        inMove.GetFigureEndPosition());
-}
-
-
 
 
 
@@ -309,75 +224,108 @@ bool OnitamaEngine::ValidateMove(
     bool inIsPlayerRed,
     MoveInformation inMove)
 {
-    std::string cardName = inMove.GetCardName();
-    Point2D figureStartPosition = inMove.GetFigureStartPosition();
-    Point2D figureEndPosition = inMove.GetFigureEndPosition();
+    MoveValidator mv = MoveValidator(
+        inIsPlayerRed,
+        inMove,
+        *this);
 
-    if (!_isOnBoard(figureStartPosition))
-    {
-        _engineState = "The start point isn't on the game board (";
-        _engineState += figureStartPosition.ToChessString() + ").";
-        return false;
-    }
-    if (!_hasOwnPieceAtLocation(inIsPlayerRed, figureStartPosition))
-    {
-        _engineState = "No piece of player ";
-        _engineState += ((inIsPlayerRed) ? "red" : "blue");
-        _engineState += " found at start point (";
-        _engineState += figureStartPosition.ToChessString() + ").";
-        return false;
-    }
-    if (!_checkIfCardExists(cardName))
-    {
-        _engineState = "The cardname ";
-        _engineState += cardName;
-        _engineState += " wasn't found at all.";
-        return false;
-    }
-    if (!_checkIfPlayerOwnsCard(inIsPlayerRed, cardName))
-    {
-        _engineState = "The player ";
-        _engineState += ((inIsPlayerRed) ? "red" : "blue");
-        _engineState += " doesn't have the card ";
-        _engineState += cardName;
-        _engineState += ".";
-        return false;
-    }
-    if (!_isOnBoard(figureEndPosition))
-    {
-        _engineState = "The end point isn't on the board (";
-        _engineState += figureEndPosition.ToChessString() + ").";
-        return false;
-    }
-    if (_hasOwnPieceAtLocation(inIsPlayerRed, figureEndPosition))
-    {
-        _engineState = "The end point is already occupied by a piece of player(";
-        _engineState += ((inIsPlayerRed) ? "red" : "blue");
-        _engineState += ".";
-        return false;
-    }
-    if (_cardHasEndpositionAsOption(
-        inIsPlayerRed, inMove))
-    {
-        _engineState = "The choosen card (" + cardName;
-        _engineState += ") doesn't allow a jump from ";
-        _engineState += figureStartPosition.ToChessString() + " to ";
-        _engineState += figureEndPosition.ToChessString() + ".";
-        return false;
-    }
-    return true;
+    bool isValidMove = mv.ValidateMove();
+    _engineStatus = mv.GetStatus();
+    return isValidMove;
 }
 
 
-
+//TODO(Simon): What if someone inserts nonsense...
 void OnitamaEngine::ApplyMove(MoveInformation inMove)
 {
+    Point2D s = inMove.GetFigureStartPosition();
+    char sField=_currentBoardState[s.GetY()][s.GetX()];
+    _currentBoardState[s.GetY()][s.GetX()] = _emptyField;
+
+    Point2D e = inMove.GetFigureEndPosition();
+    char eField = _currentBoardState[e.GetY()][e.GetX()];
+    _currentBoardState[e.GetY()][e.GetX()] = sField;
+
+    std::string currentP = (_isRedsTurn) ? "Red" : "Blue";
+    switch (eField)
+    {
+    case _blueDisciple:
+        _engineStatus = currentP + " has taken a blue disciple.";
+        break;
+    case _blueMaster:
+        _engineStatus = currentP + " has taken a blue master.";
+        break;
+    case _redDisciple:
+        _engineStatus = currentP + " has taken a red disciple.";
+        break;
+    case _redMaster:
+        _engineStatus = currentP + " has taken a red master.";
+        break;
+    case _emptyField:
+        _engineStatus = currentP + " has moved.";
+        break;
+    default:
+        _engineStatus = currentP + " has moved. (Unknown field)";
+        break;
+    }
+
+    _isRedsTurn = !_isRedsTurn;
 
 }
 
 
 OnitamaEngine::OnitamaEngine()
 {
-    _initBoard();
+    _allCards = std::vector<Card>();
+    pybind11::print("Py OnitamaEngine::OnitamaEngine()");
     _initAllCards();
+    pybind11::print("Py 1 _initAllCards");
+    _initBoard();
+    pybind11::print("Py 2 _initBoard");
+    _initPlayers();
+    pybind11::print("Py 3 _initPlayers");
 }
+
+
+std::string OnitamaEngine::PrintBoard()
+{
+    std::string ret = "";
+
+    for (int yy = _boardSize, y = _boardSize; yy > 0; yy--, y--)
+    {
+        for (int x = 0; x < _boardSize; x++)
+        {
+            ret += _currentBoardState[y][x];
+        }
+        ret += "\n";
+    }
+
+    return ret;
+}
+
+
+std::string OnitamaEngine::PrintBoardAndAxes()
+{
+    std::string ret = "";
+
+    for (int yy = _boardSize, y = _boardSize-1; yy > 0; yy--, y--)
+    {
+        ret += '0'+y;
+        ret += " ";
+        for (int x = 0; x < _boardSize; x++)
+        {
+            ret += _currentBoardState[y][x];
+        }
+        ret += "\n";
+    }
+    ret += "  ";
+    for (int x = 0; x < _boardSize; x++)
+    {
+        ret += 'A'+x;
+    }
+    ret += "\n";
+
+    return ret;
+}
+
+
