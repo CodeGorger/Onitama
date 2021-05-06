@@ -1,15 +1,8 @@
+Weitere Bib für Messages?
 
+Zobrist?
 
-
-
-Validieren erlaubter Spielzüge
-Spiel Ende (Abwickelung der Siegerkürung; Abwickelung der Verbindung)
-
-
-
-
-1. Schach notation (für Onitama): TIGER:H5G4
-2. Zobrist
+Ist die Verteilung der Karten wirklich zufällig?
 
 FigurenState_Option1=
 [[[11011], // Alle Blauen Schüler
