@@ -1,0 +1,1 @@
+echo D|xcopy /Y /I "..\x64\Release\OnitamaEngineDll.dll" "..\PythonClient\OnitamaEngine.pyd"

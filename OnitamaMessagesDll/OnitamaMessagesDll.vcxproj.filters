@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\OnitamaMessages\Source\EngineApi.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\MessageParser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\CutParameterDto.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\OnitamaMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\SessionList\SessionListMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\Move\MoveMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\JoinSessionMessage\JoinSessionMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\InvalidMove\InvalidMoveMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\Greeting\GreetingMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\GamestartRequest\GamestartRequestMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\Gamestart\GamestartMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\Gameover\GameoverMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\OnitamaMessages\Source\MessageParser.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\OnitamaMessages.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\CutParameterDto.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\OnitamaMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\SessionList\SessionListMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\Move\MoveMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\JoinSessionMessage\JoinSessionMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\InvalidMove\InvalidMoveMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\Greeting\GreetingMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\GamestartRequest\GamestartRequestMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\Gamestart\GamestartMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\Gameover\GameoverMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
