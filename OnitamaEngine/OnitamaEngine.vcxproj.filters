@@ -21,9 +21,6 @@
     <ClCompile Include="Source\Card\Card.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EngineApi\EngineApi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MoveInformation\MoveInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,15 +33,15 @@
     <ClCompile Include="Source\Point2D\Point2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PyBindEngineApi\PyBindEngineApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Point2D\Point2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Card\Card.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EngineApi\EngineApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\MoveInformation\MoveInformation.h">
@@ -57,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\OnitamaEngineLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PyBindEngineApi\PyBindEngineApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

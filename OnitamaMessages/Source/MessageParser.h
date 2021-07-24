@@ -11,23 +11,24 @@ enum class MessageStringResult
 	MessageStringResult_Complete,
 	MessageStringResult_Trash,
 	MessageStringResult_PossibleBeginning,
-	MessageStringResult_TooLongNotComplete
+	MessageStringResult_TooLongNotComplete,
+	MessageStringResult_NotInited
 };
 
 class MessageParsedDTO
 {
 private:
 	MessageStringResult _result;
-	std::unique_ptr<OnitamaMessage> _message;
+	std::shared_ptr<OnitamaMessage> _message;
 	std::string _messageRest;
 
 public:
 	MessageParsedDTO();
-	void SetMessage(std::unique_ptr<OnitamaMessage> inMsg);
+	void SetMessage(std::shared_ptr<OnitamaMessage> inMsg);
 	void SetRest(std::string inMessageRest);
 	void SetResult(MessageStringResult inResult);
 
-	OnitamaMessage* GetOnitamaMessage();
+	std::shared_ptr<OnitamaMessage>  GetOnitamaMessage();
 	MessageStringResult GetResult();
 	std::string GetRest();
 };

@@ -163,7 +163,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\OnitamaMessages\Source\EngineApi.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\MessageParser.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\CutParameterDto.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\Gameover\GameoverMessage.cpp" />
@@ -177,6 +176,7 @@
     <ClCompile Include="..\OnitamaMessages\Source\Messages\SessionList\SessionListMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.cpp" />
+    <ClCompile Include="..\OnitamaMessages\Source\PyBindMessagesApi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OnitamaMessages\Source\MessageParser.h" />

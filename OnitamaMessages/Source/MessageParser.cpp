@@ -8,13 +8,18 @@
 #include "Messages/InvalidMove/InvalidMoveMessage.h"
 #include "Messages/Gameover/GameoverMessage.h"
 #include "Messages/Move/MoveMessage.h"
+#include <iostream>
 
 #define MAX_MSG_NAME_LENGTH 30
 #define MAX_MSG_LENGTH 1024
 
 
-MessageParsedDTO::MessageParsedDTO() {}
-void MessageParsedDTO::SetMessage(std::unique_ptr<OnitamaMessage> inMsg)
+MessageParsedDTO::MessageParsedDTO()
+:_result(MessageStringResult::MessageStringResult_NotInited)
+{
+}
+
+void MessageParsedDTO::SetMessage(std::shared_ptr<OnitamaMessage> inMsg)
 {
 	_message = std::move(inMsg);
 }
@@ -29,9 +34,9 @@ void MessageParsedDTO::SetResult(MessageStringResult inResult)
 	_result = inResult;
 }
 
-OnitamaMessage* MessageParsedDTO::GetOnitamaMessage()
+std::shared_ptr<OnitamaMessage>  MessageParsedDTO::GetOnitamaMessage()
 {
-	return _message.get();
+	return _message;
 }
 
 MessageStringResult MessageParsedDTO::GetResult()
@@ -56,9 +61,9 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 	MessageParsedDTO ret;
 
 	// No endmessage symbol found but not yet at the maximal length
-	size_t firstSemicolonPos = inMessageString.find_first_of(';');
+	int firstSemicolonPos = inMessageString.find_first_of(';');
 	if (-1 == firstSemicolonPos &&
-		MAX_MSG_LENGTH <= inMessageString.length())
+		MAX_MSG_LENGTH > inMessageString.length())
 	{
 		ret.SetResult( MessageStringResult::MessageStringResult_PossibleBeginning);
 		return ret;
@@ -66,7 +71,7 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 
 	// No endmessage symbol found but already over the maximal length
 	if (-1 == firstSemicolonPos &&
-		MAX_MSG_NAME_LENGTH > inMessageString.length())
+		MAX_MSG_NAME_LENGTH <= inMessageString.length())
 	{
 		// Nothing found, but trash because too long string!
 		ret.SetResult(MessageStringResult::MessageStringResult_TooLongNotComplete);
@@ -74,7 +79,7 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 	}
 
 
-	size_t firstColonPos = inMessageString.find_first_of(':');
+	int firstColonPos = inMessageString.find_first_of(':');
 	if (-1 == firstColonPos)
 	{
 		//There should be a colon if there is a semicolon

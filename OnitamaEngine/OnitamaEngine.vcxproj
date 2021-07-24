@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Card\Card.cpp" />
-    <ClCompile Include="Source\EngineApi\EngineApi.cpp" />
+    <ClCompile Include="Source\PyBindEngineApi\PyBindEngineApi.cpp" />
     <ClCompile Include="Source\MoveInformation\MoveInformation.cpp" />
     <ClCompile Include="Source\MoveValidator\MoveValidator.cpp" />
     <ClCompile Include="Source\OnitamaEngine\OnitamaEngine.cpp" />
@@ -169,7 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Card\Card.h" />
-    <ClInclude Include="Source\EngineApi\EngineApi.h" />
+    <ClInclude Include="Source\PyBindEngineApi\PyBindEngineApi.h" />
     <ClInclude Include="Source\MoveInformation\MoveInformation.h" />
     <ClInclude Include="Source\MoveValidator\MoveValidator.h" />
     <ClInclude Include="Source\OnitamaEngineLib.h" />

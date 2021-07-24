@@ -7,9 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\OnitamaMessages\Source\EngineApi.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\OnitamaMessages\Source\MessageParser.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -47,6 +44,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\OnitamaMessages\Source\Messages\Gameover\GameoverMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\PyBindMessagesApi.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

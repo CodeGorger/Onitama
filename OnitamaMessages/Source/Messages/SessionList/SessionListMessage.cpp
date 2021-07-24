@@ -14,6 +14,12 @@ void SessionListMessage::AddSessionName(std::string inSession)
 	_sessionNames.push_back(inSession);
 }
 
+
+std::vector<std::string> SessionListMessage::GetSessionNames()
+{
+	return _sessionNames;
+}
+
 std::string SessionListMessage::ToString()
 {
 	std::string ret;

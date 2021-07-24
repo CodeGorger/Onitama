@@ -1,14 +1,18 @@
 #include "AcceptThread.h"
 
 
-
 AcceptThread::AcceptThread()
-    :ThreadHandler()
+    : ThreadHandler()
+    , _listenPort(13337)
 {
-    _outputQueue = std::make_shared<std::vector<ConnEntity>>(std::vector<ConnEntity>());
+    l = spdlog::stdout_color_mt("AcceptThread");
+//#ifdef DEBUGLOGGING
+//    l->set_level(spdlog::level::debug);
+//#endif
+    _outputQueue = ThreadSafeQueue<std::shared_ptr<ConnEntity>>();
 }
 
-std::shared_ptr<std::vector<ConnEntity>> AcceptThread::GetOutputQueue()
+ThreadSafeQueue<std::shared_ptr<ConnEntity>> AcceptThread::GetOutputQueue()
 {
     return _outputQueue;
 }
@@ -16,15 +20,18 @@ std::shared_ptr<std::vector<ConnEntity>> AcceptThread::GetOutputQueue()
 
 void AcceptThread::_do()
 {
-	_initTcpListenSocket();
-	while (!_isShutdownRequested)
-	{
-		_tcpAcceptThreadMethod();
-	}
+    l->info("Started Thread");
+    _initTcpListenSocket();
+    while (!_isShutdownRequested)
+    {
+        _tcpAcceptThreadMethod();
+    }
+    l->info("Stopped Thread");
 }
 
 int AcceptThread::_sockInit(void)
 {
+    l->debug("_sockInit");
 #ifdef _WIN32
     WSADATA wsa_data;
     return WSAStartup(MAKEWORD(1, 1), &wsa_data);
@@ -35,6 +42,7 @@ int AcceptThread::_sockInit(void)
 
 int AcceptThread::_sockQuit(void)
 {
+    l->debug("_sockQuit");
 #ifdef _WIN32
     return WSACleanup();
 #else
@@ -44,6 +52,7 @@ int AcceptThread::_sockQuit(void)
 
 int AcceptThread::_sockClose(SOCKET sock)
 {
+    l->debug("_sockClose");
     int status = 0;
 
 #ifdef _WIN32
@@ -59,57 +68,54 @@ int AcceptThread::_sockClose(SOCKET sock)
 
 int AcceptThread::_initTcpListenSocket()
 {
+    l->info("TCP Socket init started");
     if (0 != _sockInit())
     {
-        std::cout << "Socket Init Failed! (" <<
-            WSAGetLastError() << ")" << std::endl;
+        l->error("Socket Init Failed! ({0})", WSAGetLastError());
         return 1;
     }
     else
     {
-        std::cout << "Socket Init Success!" << std::endl;
+        l->debug("Socket Init Success!");
     }
 
     _listenSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (INVALID_SOCKET == _listenSocket)
     {
-        std::cout << "Socket Creation Failed! (" <<
-            WSAGetLastError() << ")" << std::endl;
+        l->error("Socket Creation Failed! ({0})", WSAGetLastError());
         return 2;
     }
     else
     {
-        std::cout << "Socket Creation Success!" << std::endl;
+        l->debug("Socket Creation Success!");
     }
 
     SOCKADDR_IN addr;
     memset(&addr, 0, sizeof(SOCKADDR_IN));
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(12345);
+    addr.sin_port = htons(_listenPort);
     addr.sin_addr.s_addr = ADDR_ANY;
     if (SOCKET_ERROR ==
         bind(_listenSocket,
             (SOCKADDR*)&addr,
             sizeof(SOCKADDR_IN)))
     {
-        std::cout << "Socket Bind Failed! (" <<
-            WSAGetLastError() << ")" << std::endl;
+        l->error("Socket Bind Failed! ({0})", WSAGetLastError());
         return 3;
     }
     else
     {
-        std::cout << "Socket Bind Success!" << std::endl;
+        l->debug("Socket Bind Success!");
     }
 
     if (SOCKET_ERROR == listen(_listenSocket, 10))
     {
-        std::cout << "Socket Listen Failed! (" <<
-            WSAGetLastError() << ")" << std::endl;
+        l->error("Socket Listen Failed! ({0})", WSAGetLastError());
         return 4;
     }
     else
     {
-        std::cout << "Socket Listen Success!" << std::endl;
+        l->debug("Socket Listen Success!");
     }
     return 0;
 }
@@ -117,20 +123,44 @@ int AcceptThread::_initTcpListenSocket()
 
 int AcceptThread::_tcpAcceptThreadMethod()
 {
-    SOCKET connectedSocket;
-    connectedSocket = accept(_listenSocket, NULL, NULL);
+    l->debug("_tcpAcceptThreadMethod");
+    // Needed for peer ip 
+    struct sockaddr_in peer_addr;
+    socklen_t peer_addrlen = sizeof(peer_addr);
+    memset(&peer_addr, '\0', peer_addrlen);
+    char str[INET_ADDRSTRLEN];
+
+    // The actual accept ... 
+    SOCKET connectedSocket = accept(
+        _listenSocket, 
+        (struct sockaddr*)&peer_addr, 
+        &peer_addrlen);
     if (INVALID_SOCKET == connectedSocket)
     {
-        std::cout << "Socket Accept Failed! (" <<
-            WSAGetLastError() << ")" << std::endl;
-        //threadHadNoProblem = true;
+        l->error("Socket Accept Failed! ({0}; IP: {1})",
+            WSAGetLastError(),
+            inet_ntop(AF_INET,
+                &peer_addr.sin_addr, 
+                str,
+                sizeof(str)));
         return 5;
     }
     else
     {
-        std::cout << "Socket Accept Success!" << std::endl;
+        l->debug("Socket Accept Success!");
     }
 
-    ConnEntity ec = ConnEntity(connectedSocket);
-    _outputQueue->push_back(ec);
+    l->info("Socket: {0}", connectedSocket);
+    std::shared_ptr<ConnEntity> ec = std::make_shared<ConnEntity>(connectedSocket);
+    ec->SetIp(inet_ntop(AF_INET,
+        &peer_addr.sin_addr,
+        str,
+        sizeof(str)));
+    ec->SetPort(std::to_string(ntohs(peer_addr.sin_port)));
+
+    l->info("Connection established from {0}:{1}.",
+        ec->GetIp(),
+        ec->GetPort());
+
+    _outputQueue.Enque(ec);
 }

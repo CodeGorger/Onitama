@@ -11,6 +11,8 @@ public:
 	SessionListMessage();
 	void AddSessionName(std::string inSession);
 
+	std::vector<std::string> GetSessionNames();
+
 	std::string ToString();
 	void ParseContent(std::string inMessageContent);
 

@@ -5,17 +5,21 @@
 #include <iostream>
 #include "../Thread/ThreadHandler.h"
 #include "../ConnEntity/ConnEntity.h"
+#include "../ThreadSafeQueue/ThreadSafeQueue.h"
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 class AcceptThread :public ThreadHandler
 {
 public:
 	AcceptThread();
-	std::shared_ptr<std::vector<ConnEntity>> GetOutputQueue();
+	ThreadSafeQueue<std::shared_ptr<ConnEntity>> GetOutputQueue();
 
 private:
 	void _do();
 
-	std::shared_ptr<std::vector<ConnEntity>> _outputQueue;
+	ThreadSafeQueue<std::shared_ptr<ConnEntity>> _outputQueue;
 
 	SOCKET _listenSocket;
 
@@ -25,7 +29,9 @@ private:
 	int _initTcpListenSocket();
 	int _tcpAcceptThreadMethod();
 
+	int _listenPort;
 
+	std::shared_ptr<spdlog::logger> l;
 };
 
 

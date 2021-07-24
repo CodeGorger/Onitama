@@ -146,11 +146,11 @@ void OnitamaEngine::_initAllCards()
 
 void OnitamaEngine::_initPlayers()
 {
-    pybind11::print("Py OnitamaEngine::_initPlayers");
+    // pybind11::print("Py OnitamaEngine::_initPlayers");
     _currentCardsRed = std::vector<Card>();
     _currentCardsBlue = std::vector<Card>();
 
-    pybind11::print("Py _getRandomCards(5)");
+    // pybind11::print("Py _getRandomCards(5)");
     std::vector<Card> c = _getRandomCards(5);
     if (5 > c.size())
     {
@@ -158,7 +158,7 @@ void OnitamaEngine::_initPlayers()
         return;
     }
 
-    pybind11::print("Py (5 <= c.size())");
+    // pybind11::print("Py (5 <= c.size())");
     _currentCardsRed.push_back(c[0]);
     _currentCardsRed.push_back(c[1]);
     _currentCardsBlue.push_back(c[2]);
@@ -171,13 +171,13 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
 {
     if (0 == _allCards.size())
     {
-        pybind11::print("Py _initAllCards()");
+        // pybind11::print("Py _initAllCards()");
         _initAllCards();
     }
 
     if (0 == inAmount || 0 == _allCards.size())
     {
-        pybind11::print("Py (0 == inAmount || 0 == _allCards.size())");
+        // pybind11::print("Py (0 == inAmount || 0 == _allCards.size())");
         return std::vector<Card>();
     }
 
@@ -192,16 +192,16 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
 
     // Approaching backwards, removing until required amount is given
     srand((unsigned int)time(NULL));
-    pybind11::print("Py srand((unsigned int)time(NULL))");
+    // pybind11::print("Py srand((unsigned int)time(NULL))");
 
     while (randomIds.size() > inAmount)
     {
-        pybind11::print("(randomIds.size() > inAmount)", randomIds.size(), inAmount);
+        // pybind11::print("(randomIds.size() > inAmount)", randomIds.size(), inAmount);
 
         int rnd = rand();
 
         int tmpRandomId = rnd % randomIds.size();
-        pybind11::print("rand, randId ", rnd, tmpRandomId);
+        // pybind11::print("rand, randId ", rnd, tmpRandomId);
         randomIds.erase(randomIds.begin() + tmpRandomId);
     }
 
@@ -210,7 +210,7 @@ std::vector<Card> OnitamaEngine::_getRandomCards(unsigned int inAmount)
     {
         ret.push_back(_allCards[randomIds[i]]);
     }
-    pybind11::print("Py ret.push_back(_allCards[randomIds[i]]);");
+    // pybind11::print("Py ret.push_back(_allCards[randomIds[i]]);");
 
     auto rng = std::default_random_engine{};
     std::shuffle(std::begin(ret), std::end(ret), rng);
@@ -313,13 +313,13 @@ void OnitamaEngine::ApplyMove(MoveInformation inMove)
 OnitamaEngine::OnitamaEngine()
 {
     _allCards = std::vector<Card>();
-    pybind11::print("Py OnitamaEngine::OnitamaEngine()");
+    // pybind11::print("Py OnitamaEngine::OnitamaEngine()");
     _initAllCards();
-    pybind11::print("Py 1 _initAllCards");
+    // pybind11::print("Py 1 _initAllCards");
     _initBoard();
-    pybind11::print("Py 2 _initBoard");
+    // pybind11::print("Py 2 _initBoard");
     _initPlayers();
-    pybind11::print("Py 3 _initPlayers");
+    // pybind11::print("Py 3 _initPlayers");
 }
 
 

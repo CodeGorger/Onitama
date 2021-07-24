@@ -11,7 +11,7 @@ class GameThread :public ThreadHandler
 public:
 	GameThread(GameSession inGameSession);
 	void SetLobbyConnections(
-		std::shared_ptr<std::vector<ConnEntity>> inLobbyConnections);
+		std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>> inLobbyConnections);
 
 private:
 	void _do();
@@ -31,7 +31,7 @@ private:
 	// required to determine timeouts
 	int _turnStartTime;
 
-	std::shared_ptr<std::vector<ConnEntity>>
+	std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>>
 		_lobbyConnections;
 
 	void _sendPlayerACardsState(

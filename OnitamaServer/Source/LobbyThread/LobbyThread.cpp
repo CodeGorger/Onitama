@@ -4,49 +4,98 @@
 #include <OnitamaMessages.h>
 
 void LobbyThread::SetConnectionInputQueue(
-    std::shared_ptr<std::vector<ConnEntity>>
+    ThreadSafeQueue<std::shared_ptr<ConnEntity>>
     inUngreetedConnectionsQueue)
 {
+    l = spdlog::stdout_color_mt("LobbyThread");
+#ifdef DEBUGLOGGING
+    l->set_level(spdlog::level::debug);
+#endif
     _ungreetedConnections = inUngreetedConnectionsQueue;
-    _lobbyConnections = 
-        std::make_shared<std::vector<ConnEntity>>(std::vector<ConnEntity>());
+    _lobbyConnections = ThreadSafeQueue< std::shared_ptr<ConnEntity>>();
 }
 
 
 void LobbyThread::_do()
 {
-	while (!_isShutdownRequested)
-	{
-        // Takes new connections that have greeted properly
-        _checkUngreetedNewEntities();
-
-        // Sends a list of all sessions to everyone in the lobby
-        _sendSessionList();
-
-        // Handle join session requests
-        _handleJoinSession();
-
-        // Handle start requests
-        _handleStartSession();
-	}
+    l->info("Started Thread");
+    _timedLoop();
+    l->info("Stopped Thread");
 }
 
 
+// Will execute _timedDo() maximally 1 each second
+void LobbyThread::_timedLoop()
+{
+    clock_t loopStart;
+    clock_t loopEnd;
+    clock_t loopDuration;
+    unsigned int loopDurationInMs;
+    while (!_isShutdownRequested)
+    {
+        loopStart = clock();
+        {
+            _timedDo();
+        }
+
+        loopEnd = clock();
+        loopDuration = loopEnd - loopStart;
+        loopDurationInMs = (loopDuration * 1000) / CLOCKS_PER_SEC;
+
+        //loopStartInMs = ((loopStart - globalStart) * 1000) / CLOCKS_PER_SEC;
+        //std::cout << "Start: " << loopStartInMs << "; Took: " 
+        // << loopDurationInMs << " ms" << std::endl;
+
+        if (loopDurationInMs > 1000)
+        {
+            l->warn("Loop stalled for {0} ms.", loopDurationInMs);
+        }
+        else
+        {
+            Sleep(1000 - loopDurationInMs);
+        }
+    }
+}
+
+
+// Will execute _timedDo() maximally 1 each second
+void LobbyThread::_timedDo()
+{
+    // Takes new connections that have greeted properly
+    _checkUngreetedNewEntities();
+
+    // Sends a list of all sessions to everyone in the lobby
+    _sendSessionList();
+
+    // Handle join session requests
+    _handleJoinSession();
+
+    // Handle start requests
+    _handleStartSession();
+
+    // Remove closed connections
+    _removedClosedConnections();
+}
 
 
 void LobbyThread::_checkUngreetedNewEntities()
 {
-    for (int i = 0; i < _ungreetedConnections->size(); i++)
+    l->debug("_checkUngreetedNewEntities");
+    for (unsigned int i = 0; i < _ungreetedConnections.Size(); i++)
     {
-        bool properGreeted=
-            (0==(*_ungreetedConnections.get())[i].ReadGreetingMessage());
-
+        bool properGreeted =
+            (0 == _ungreetedConnections.Get(i)->ReadGreetingMessage());
         if (properGreeted)
         {
-            _lobbyConnections->push_back(
-                (*_ungreetedConnections.get())[i]);
-            _ungreetedConnections.get()->erase(
-                _ungreetedConnections.get()->begin() + i);
+            l->info("IP {0}:{1} has greeted properly as {2}.",
+                _ungreetedConnections.Get(i)->GetIp(),
+                _ungreetedConnections.Get(i)->GetPort(),
+                _ungreetedConnections.Get(i)->GetPlayername());
+            _lobbyConnections.Enque(
+                _ungreetedConnections.Get(i));
+            _ungreetedConnections.Remove(i);
+            //TODO(Simon): Don't just remove, remember to be removed 
+            // and do this at end. Alternative make a map and handle it this.
         }
     }
 }
@@ -54,15 +103,23 @@ void LobbyThread::_checkUngreetedNewEntities()
 
 void LobbyThread::_sendSessionList()
 {
+    l->debug("_sendSessionList");
     SessionListMessage m = SessionListMessage();
-    
-    for (int i = 0; i< _unstartedGameSessionList->size(); i++)
+
+    for (unsigned int i = 0; i < _unstartedGameSessionList.Size(); i++)
     {
-        m.AddSessionName((*_unstartedGameSessionList.get())[i].GetSessionName());
+        //TODO(Simon): What is the limit for sessions in one message?
+        m.AddSessionName(_unstartedGameSessionList.Get(i)->GetSessionName());
     }
-    for (int i = 0; i < _lobbyConnections->size(); i++)
+    for (unsigned int i = 0; i < _lobbyConnections.Size(); i++)
     {
-        (*_lobbyConnections.get())[i].Send(m.ToString());
+        _lobbyConnections.Get(i)->Send(m.ToString());
+    }
+    if (0 < _lobbyConnections.Size())
+    {
+        l->info("Created a SessionListMessage with {0} entries. Sent it to {1} lobby connections. ",
+            _unstartedGameSessionList.Size(),
+            _lobbyConnections.Size());
     }
 }
 
@@ -74,24 +131,48 @@ void LobbyThread::_sendSessionList()
 // if the session doesn't exist, the session will be created
 void LobbyThread::_handleJoinSession()
 {
+    l->debug("_handleJoinSession");
     // go through each connection
-    for (int i = 0; i < _lobbyConnections->size(); i++)
+    for (unsigned int i = 0; i < _lobbyConnections.Size(); i++)
     {
         // try to read a join session msg
         ReadJoinSessionDto rjsd =
-            (*_lobbyConnections.get())[i].ReadJoinSessionMessage();
+            _lobbyConnections.Get(i)->ReadJoinSessionMessage();
 
-        if (0 == rjsd.GetReturnStatus()) 
+        if (0 == rjsd.GetReturnStatus())
         {
             // A join session msg was read successfully,
             // try to add it to an existing session
-            if (1==_addToExistingSession(
-                       rjsd.GetSessionName(), i))
+            int r = _addToExistingSession(
+                rjsd.GetSessionName(), i);
+            if (1 == r)
             {
+                l->info("User {0} tried to join session {1}, it will be created.",
+                    _lobbyConnections.Get(i)->GetPlayername(),
+                    rjsd.GetSessionName());
+
                 // couldnt find such a session
                 // create the session
                 _createNewSession(
                     rjsd.GetSessionName(), i);
+            }
+            else if (0 == r)
+            {
+                l->info("User {0} joined session {1}.",
+                    _lobbyConnections.Get(i)->GetPlayername(),
+                    rjsd.GetSessionName());
+            }
+            else if (2 == r)
+            {
+                l->info("User {0} tried to join session {1}, but it is already full.",
+                    _lobbyConnections.Get(i)->GetPlayername(),
+                    rjsd.GetSessionName());
+            }
+            else
+            {
+                l->info("User {0} tried to join session {1}, but it didn't work because of an unknown reason.",
+                    _lobbyConnections.Get(i)->GetPlayername(),
+                    rjsd.GetSessionName());
             }
         }
     }
@@ -100,18 +181,22 @@ void LobbyThread::_handleJoinSession()
 
 void LobbyThread::_handleStartSession()
 {
-    for (int is = 0; is < _unstartedGameSessionList->size(); is++)
+    l->debug("_handleStartSession");
+    for (unsigned int is = 0; is < _unstartedGameSessionList.Size(); is++)
     {
-        GameSession gs = (*_unstartedGameSessionList.get())[is];
-        bool ssession = gs.ReadStartRequestSessionMessage();
+        std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(is);
+        bool ssession = gs->ReadStartRequestSessionMessage();
         if (ssession)
         {
-            _launchedGameSessionList.get()->push_back(gs);
-
-            _unstartedGameSessionList.get()->erase(
-                _unstartedGameSessionList.get()->begin() + is);
-
+            l->info("Session {0} with User {1} and {2} has been started.",
+                gs->GetSessionName(),
+                gs->GetPlayerA()->GetPlayername(),
+                gs->GetPlayerB()->GetPlayername());
+            _launchedGameSessionList.Enque(gs);
+            _unstartedGameSessionList.Remove(is);
             is--;
+
+            //TODO(Simon): GameThread must be started here !!!
         }
     }
 }
@@ -126,23 +211,23 @@ void LobbyThread::_handleStartSession()
 //        1: didnt add to another session, because no session found
 //        2: didnt add to another session, full session found
 int LobbyThread::_addToExistingSession(
-    std::string inSessionToJoin, 
+    std::string inSessionToJoin,
     int inConnectionIdInLobbyConnectionLost)
 {
-    for (int is = 0; is < _unstartedGameSessionList->size(); is++)
+    l->debug("_addToExistingSession");
+    for (unsigned int is = 0; is < _unstartedGameSessionList.Size(); is++)
     {
-        if (inSessionToJoin ==(*_unstartedGameSessionList.get())[is].GetSessionName())
+        if (inSessionToJoin == _unstartedGameSessionList.Get(is)->GetSessionName())
         {
-            if ((*_unstartedGameSessionList.get())[is].HasTwoPlayer())
+            if (_unstartedGameSessionList.Get(is)->HasTwoPlayer())
             {
                 return 2;
             }
 
-            (*_unstartedGameSessionList.get())[is].SetConnEntityA(
-                (*_lobbyConnections.get())[inConnectionIdInLobbyConnectionLost]);
+            _unstartedGameSessionList.Get(is)->SetConnEntityA(
+                _lobbyConnections.Get(inConnectionIdInLobbyConnectionLost));
 
-            _lobbyConnections.get()->erase(
-                _lobbyConnections.get()->begin() + inConnectionIdInLobbyConnectionLost);
+            _lobbyConnections.Remove(inConnectionIdInLobbyConnectionLost);
 
             return 0;
         }
@@ -152,19 +237,48 @@ int LobbyThread::_addToExistingSession(
 
 
 void LobbyThread::_createNewSession(
-    std::string inSessionToJoin, 
+    std::string inSessionToJoin,
     int inConnectionIdInLobbyConnectionLost)
 {
-    GameSession newGameSession;
-    newGameSession.SetSessionName(inSessionToJoin);
-    newGameSession.SetConnEntityB(
-        (*_lobbyConnections.get())[inConnectionIdInLobbyConnectionLost]);
-    _unstartedGameSessionList->push_back(newGameSession);
-    _lobbyConnections.get()->erase(
-        _lobbyConnections.get()->begin() + 
+    l->debug("_createNewSession");
+    std::shared_ptr<GameSession> newGameSession;
+    newGameSession->SetSessionName(inSessionToJoin);
+    newGameSession->SetConnEntityB(
+        _lobbyConnections.Get(inConnectionIdInLobbyConnectionLost));
+    _unstartedGameSessionList.Enque(newGameSession);
+    _lobbyConnections.Remove(
         inConnectionIdInLobbyConnectionLost);
 }
 
+void LobbyThread::_removedClosedConnections()
+{
+    for (int i = 0; i < _ungreetedConnections.Size(); i++)
+    {
+        if (_ungreetedConnections.Get(i)->IsClosed())
+        {
+            _ungreetedConnections.Remove(i);
+            i--;
+        }
+    }
+
+    for (int i = 0; i < _lobbyConnections.Size(); i++)
+    {
+        if (_lobbyConnections.Get(i)->IsClosed())
+        {
+            _lobbyConnections.Remove(i);
+            i--;
+        }
+    }
+
+    for (int i = 0; i < _unstartedGameSessionList.Size(); i++)
+    {
+        if (_unstartedGameSessionList.Get(i)->CheckConnectionsIfClosed())
+        {
+            _unstartedGameSessionList.Remove(i);
+            i--;
+        }
+    }
+}
 
 void LobbyThread::_handleOpenSessionTimeout()
 {

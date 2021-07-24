@@ -7,9 +7,10 @@ class GreetingMessage :public OnitamaMessage
 {
 public:
 	GreetingMessage();
-	virtual void ParseContent(std::string inMessageContent);
+	void ParseContent(std::string inMessageContent);
 
 	std::string GetPlayerName();
+	void SetPlayerName(std::string);
 	std::string ToString();
 
 private:

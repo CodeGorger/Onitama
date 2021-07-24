@@ -10,13 +10,16 @@ public:
 	GameSession();
 	std::string GetSessionName();
 	void SetSessionName(std::string inSessionName);
-	void SetConnEntityA(ConnEntity inConnectionEntity);
-	void SetConnEntityB(ConnEntity inConnectionEntity);
+	void SetConnEntityA(std::shared_ptr<ConnEntity> inConnectionEntity);
+	void SetConnEntityB(std::shared_ptr<ConnEntity> inConnectionEntity);
 	bool ReadStartRequestSessionMessage();
 	bool HasTwoPlayer();
 
-	ConnEntity GetPlayerA();
-	ConnEntity GetPlayerB();
+	std::shared_ptr<ConnEntity> GetPlayerA();
+	std::shared_ptr<ConnEntity> GetPlayerB();
+
+	// If both _connEntityA and _connEntityB are closed return true
+	bool CheckConnectionsIfClosed();
 
 private:
 
@@ -27,12 +30,12 @@ private:
 	// Starting player or 
 	// the one taking the seat after this one left without starting
 	// Player Red
-	ConnEntity _connEntityA;
+	std::shared_ptr<ConnEntity> _connEntityA;
 
 	// Joining player or 
 	// the one joined last
 	// Player Blue
-	ConnEntity _connEntityB;
+	std::shared_ptr<ConnEntity> _connEntityB;
 };
 
 #endif

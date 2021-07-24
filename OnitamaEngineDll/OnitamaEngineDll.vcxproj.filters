@@ -13,9 +13,6 @@
     <ClInclude Include="..\OnitamaEngine\Source\Card\Card.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\OnitamaEngine\Source\EngineApi\EngineApi.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\OnitamaEngine\Source\MoveInformation\MoveInformation.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -28,15 +25,13 @@
     <ClInclude Include="..\OnitamaEngine\Source\Point2D\Point2D.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\OnitamaEngine\Source\PyBindEngineApi\PyBindEngineApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\OnitamaEngine\Source\start.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\OnitamaEngine\Source\Card\Card.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OnitamaEngine\Source\EngineApi\EngineApi.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\OnitamaEngine\Source\MoveInformation\MoveInformation.cpp">
@@ -49,6 +44,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\OnitamaEngine\Source\Point2D\Point2D.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaEngine\Source\PyBindEngineApi\PyBindEngineApi.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

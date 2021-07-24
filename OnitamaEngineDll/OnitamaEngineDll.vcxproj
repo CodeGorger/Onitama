@@ -20,20 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OnitamaEngine\Source\Card\Card.h" />
-    <ClInclude Include="..\OnitamaEngine\Source\EngineApi\EngineApi.h" />
     <ClInclude Include="..\OnitamaEngine\Source\MoveInformation\MoveInformation.h" />
     <ClInclude Include="..\OnitamaEngine\Source\MoveValidator\MoveValidator.h" />
     <ClInclude Include="..\OnitamaEngine\Source\OnitamaEngineLib.h" />
     <ClInclude Include="..\OnitamaEngine\Source\OnitamaEngine\OnitamaEngine.h" />
     <ClInclude Include="..\OnitamaEngine\Source\Point2D\Point2D.h" />
+    <ClInclude Include="..\OnitamaEngine\Source\PyBindEngineApi\PyBindEngineApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\OnitamaEngine\Source\Card\Card.cpp" />
-    <ClCompile Include="..\OnitamaEngine\Source\EngineApi\EngineApi.cpp" />
     <ClCompile Include="..\OnitamaEngine\Source\MoveInformation\MoveInformation.cpp" />
     <ClCompile Include="..\OnitamaEngine\Source\MoveValidator\MoveValidator.cpp" />
     <ClCompile Include="..\OnitamaEngine\Source\OnitamaEngine\OnitamaEngine.cpp" />
     <ClCompile Include="..\OnitamaEngine\Source\Point2D\Point2D.cpp" />
+    <ClCompile Include="..\OnitamaEngine\Source\PyBindEngineApi\PyBindEngineApi.cpp" />
     <ClCompile Include="..\OnitamaEngine\Source\start.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -111,6 +111,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>python37.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Python37\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)OnitamaEngineDll\postbuild.bat"</Command>
@@ -131,6 +133,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>python37.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Python37\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)OnitamaEngineDll\postbuild.bat"</Command>
@@ -147,6 +151,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>python37.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Python37\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)OnitamaEngineDll\postbuild.bat"</Command>
@@ -168,6 +174,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Python37\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>python37.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)OnitamaEngineDll\postbuild.bat"</Command>

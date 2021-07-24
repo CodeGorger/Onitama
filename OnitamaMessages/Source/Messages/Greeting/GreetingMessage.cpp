@@ -29,6 +29,10 @@ std::string GreetingMessage::GetPlayerName()
 	return _playerName;
 }
 
+void GreetingMessage::SetPlayerName(std::string inPlayerName)
+{
+	_playerName = inPlayerName;
+}
 
 std::string GreetingMessage::ToString()
 {

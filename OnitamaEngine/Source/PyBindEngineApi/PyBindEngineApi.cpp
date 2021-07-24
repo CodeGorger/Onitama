@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <pybind11/pybind11.h>
-#include "EngineApi.h"
+#include "PyBindEngineApi.h"
 #include "../OnitamaEngine/OnitamaEngine.h"
 #include <pybind11/stl.h>
 

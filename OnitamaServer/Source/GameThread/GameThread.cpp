@@ -29,7 +29,7 @@ GameThread::GameThread(GameSession inGameSession)
 
 
 void GameThread::SetLobbyConnections(
-	std::shared_ptr<std::vector<ConnEntity>> inLobbyConnections)
+	std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>> inLobbyConnections)
 {
 	_lobbyConnections = inLobbyConnections;
 }
@@ -61,7 +61,7 @@ void GameThread::_sendPlayerACardsState(
 	gsMes.SetCenterCard(inC.GetName());
 
 	gsMes.SetStartingPlayer(inC.IsRedStartPlayer());
-	_sessionInformation.GetPlayerA().Send(gsMes.ToString());
+	_sessionInformation.GetPlayerA()->Send(gsMes.ToString());
 }
 
 
@@ -83,7 +83,7 @@ void GameThread::_sendPlayerBCardsState(
 	gsMes.SetCenterCard(inC.GetName());
 
 	gsMes.SetStartingPlayer(!inC.IsRedStartPlayer());
-	_sessionInformation.GetPlayerB().Send(gsMes.ToString());
+	_sessionInformation.GetPlayerB()->Send(gsMes.ToString());
 }
 
 // Will execute _timedDo() maximally 1 each second
@@ -137,11 +137,11 @@ void GameThread::_processActivePlayer()
 	ReadMoveInfoDto rmid;
 	if (_redsTurn)
 	{
-		rmid = _sessionInformation.GetPlayerA().ReadMoveInfo();
+		rmid = _sessionInformation.GetPlayerA()->ReadMoveInfo();
 	}
 	else
 	{
-		rmid = _sessionInformation.GetPlayerB().ReadMoveInfo();
+		rmid = _sessionInformation.GetPlayerB()->ReadMoveInfo();
 	}
 
 	if (0 != rmid.GetReturnStatus())
@@ -198,11 +198,11 @@ void GameThread::_sendUnactivePlayerNotification()
 	wopMes.SetTimeLeftInS(timeLeftInSecs);
 	if (_redsTurn)
 	{
-		_sessionInformation.GetPlayerB().Send(wopMes.ToString());
+		_sessionInformation.GetPlayerB()->Send(wopMes.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA().Send(wopMes.ToString());
+		_sessionInformation.GetPlayerA()->Send(wopMes.ToString());
 	}
 }
 
@@ -228,11 +228,11 @@ void GameThread::_sendUnactivePlayerMoveInformation(
 
 	if (_redsTurn)
 	{
-		_sessionInformation.GetPlayerB().Send(mMes.ToString());
+		_sessionInformation.GetPlayerB()->Send(mMes.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA().Send(mMes.ToString());
+		_sessionInformation.GetPlayerA()->Send(mMes.ToString());
 	}
 }
 
@@ -286,13 +286,13 @@ void GameThread::_sendGameoverMessageToBothPlayers(
 
 	if (_engine.HasRedLost())
 	{
-		_sessionInformation.GetPlayerA().Send(goMesWin.ToString());
-		_sessionInformation.GetPlayerB().Send(goMesLoss.ToString());
+		_sessionInformation.GetPlayerA()->Send(goMesWin.ToString());
+		_sessionInformation.GetPlayerB()->Send(goMesLoss.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA().Send(goMesLoss.ToString());
-		_sessionInformation.GetPlayerB().Send(goMesWin.ToString());
+		_sessionInformation.GetPlayerA()->Send(goMesLoss.ToString());
+		_sessionInformation.GetPlayerB()->Send(goMesWin.ToString());
 	}
 }
 

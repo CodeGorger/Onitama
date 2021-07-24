@@ -62,5 +62,8 @@
     <ClInclude Include="Source\ConnEntity\ReadJoinSessionDto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ThreadSafeQueue\ThreadSafeQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

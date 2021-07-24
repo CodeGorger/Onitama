@@ -1,22 +1,28 @@
 #ifndef _LOBBYTHREAD_H_
 #define _LOBBYTHREAD_H_
 
+#include "../ThreadSafeQueue/ThreadSafeQueue.h"
 #include "../Thread/ThreadHandler.h"
 #include <vector>
 #include "../ConnEntity/ConnEntity.h"
 #include "../GameSession/GameSession.h"
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 class LobbyThread :public ThreadHandler
 {
 
 public:
 	void SetConnectionInputQueue(
-		std::shared_ptr<std::vector<ConnEntity>>
+		ThreadSafeQueue< std::shared_ptr<ConnEntity>>
 		inUngreetedConnectionsQueue);
 
 
 private:
 	void _do();
+	void _timedLoop();
+	void _timedDo();
 
 	// Takes new connections that have greeted properly
 	void _checkUngreetedNewEntities();
@@ -38,20 +44,26 @@ private:
 		std::string inSessionToJoin,
 		int inConnectionIdInLobbyConnectionLost);
 
+	// Will removed connections and maintain GameSession
+	// with closed sockets
+	void _removedClosedConnections();
+
 	void _handleOpenSessionTimeout();
 
-	std::shared_ptr<std::vector<ConnEntity>>
+	ThreadSafeQueue< std::shared_ptr<ConnEntity>>
 		_ungreetedConnections;
 
-	std::shared_ptr<std::vector<ConnEntity>>
+	ThreadSafeQueue< std::shared_ptr<ConnEntity>>
 		_lobbyConnections;
 
-	std::shared_ptr<std::vector<GameSession>>
+	ThreadSafeQueue< std::shared_ptr<GameSession>>
 		_unstartedGameSessionList;
 
-	std::shared_ptr<std::vector<GameSession>>
+	ThreadSafeQueue< std::shared_ptr<GameSession>>
 		_launchedGameSessionList;
 
+	std::shared_ptr<spdlog::logger> l;
 };
 
 #endif
+
