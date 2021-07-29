@@ -57,6 +57,12 @@
     <ClCompile Include="Source\PyBindMessagesApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Messages\SessionInformation\SessionInformationMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\MessageParser.h">
@@ -99,6 +105,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\SessionInformation\SessionInformationMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

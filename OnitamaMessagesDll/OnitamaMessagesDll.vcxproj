@@ -171,8 +171,10 @@
     <ClCompile Include="..\OnitamaMessages\Source\Messages\Greeting\GreetingMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\InvalidMove\InvalidMoveMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\JoinSessionMessage\JoinSessionMessage.cpp" />
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\Move\MoveMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\OnitamaMessage.cpp" />
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\SessionInformation\SessionInformationMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\SessionList\SessionListMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.cpp" />
     <ClCompile Include="..\OnitamaMessages\Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.cpp" />
@@ -187,8 +189,10 @@
     <ClInclude Include="..\OnitamaMessages\Source\Messages\Greeting\GreetingMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\InvalidMove\InvalidMoveMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\JoinSessionMessage\JoinSessionMessage.h" />
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\Move\MoveMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\OnitamaMessage.h" />
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\SessionInformation\SessionInformationMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\SessionList\SessionListMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.h" />
     <ClInclude Include="..\OnitamaMessages\Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.h" />

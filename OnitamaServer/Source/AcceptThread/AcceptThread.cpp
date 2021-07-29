@@ -163,4 +163,6 @@ int AcceptThread::_tcpAcceptThreadMethod()
         ec->GetPort());
 
     _outputQueue.Enque(ec);
+
+    return 0;
 }

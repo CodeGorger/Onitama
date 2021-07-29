@@ -14,13 +14,19 @@ OnitamaMessage::OnitamaMessage(
 
 CutParameterDto OnitamaMessage::CutNextParameter(std::string inMessageContent)
 {
-	size_t firstComma = inMessageContent.find_first_of(',');
-	std::string cutParameter = inMessageContent.substr(0, firstComma);
-	std::string contentRest = inMessageContent.substr(
-		firstComma - 1,
-		cutParameter.length() - firstComma);
-
 	CutParameterDto ret;
+
+	int firstComma = inMessageContent.find_first_of(',');
+	if (-1 == firstComma)
+	{
+		ret.SetParameter("");
+		ret.SetContentRest("");
+		ret.SetSuccessStatus(false);
+		return ret;
+	}
+
+	std::string cutParameter = inMessageContent.substr(0, firstComma);
+	std::string contentRest = inMessageContent.substr(firstComma+1);
 
 	ret.SetParameter(cutParameter);
 	ret.SetContentRest(contentRest);

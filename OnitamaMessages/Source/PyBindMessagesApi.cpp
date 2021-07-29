@@ -6,6 +6,10 @@
 #include <pybind11/stl.h>
 #include "Messages/Greeting/GreetingMessage.h"
 #include "Messages/SessionList/SessionListMessage.h"
+#include "Messages/JoinSessionMessage/JoinSessionMessage.h"
+#include "Messages/SessionInformation/SessionInformationMessage.h"
+#include "Messages/GamestartRequest/GamestartRequestMessage.h"
+#include "Messages/LeaveSessionMessage/LeaveSessionMessage.h"
 
 
 PYBIND11_MODULE(OnitamaMessages, m)
@@ -13,6 +17,7 @@ PYBIND11_MODULE(OnitamaMessages, m)
 	m.doc() = "OnitamaMessages DLL";
 	m.def("ParseMessage", &ParseMessage, 
 		"Will parse a message-string and return a message object.");
+
 
 	////TODO(Simon): Add doc for python
 	//pybind11::class_<OnitamaEngine>(m, "OnitamaEngine")
@@ -27,7 +32,6 @@ PYBIND11_MODULE(OnitamaMessages, m)
 	//	//.def("GetAllPossibleMoves", &OnitamaEngine::GetAllPossibleMoves);
 
 
-
 	pybind11::class_<MessageParsedDTO>(m, "MessageParsedDTO")
 		.def(pybind11::init<>())
 		.def("SetMessage", &MessageParsedDTO::SetMessage)
@@ -37,8 +41,9 @@ PYBIND11_MODULE(OnitamaMessages, m)
 		.def("GetResult", &MessageParsedDTO::GetResult)
 		.def("GetRest", &MessageParsedDTO::GetRest);
 	
+	pybind11::class_<OnitamaMessage, std::shared_ptr<OnitamaMessage>>(m, "OnitamaMessage");
 
-	pybind11::class_<GreetingMessage>(m, "GreetingMessage")
+	pybind11::class_<GreetingMessage, std::shared_ptr<GreetingMessage>>(m, "GreetingMessage")
 		.def(pybind11::init<>())
 		.def("ParseContent", &GreetingMessage::ParseContent)
 		.def("ToString", &GreetingMessage::ToString)
@@ -46,11 +51,41 @@ PYBIND11_MODULE(OnitamaMessages, m)
 		.def("SetPlayerName", &GreetingMessage::SetPlayerName);
 
 
-	pybind11::class_<SessionListMessage>(m, "SessionListMessage")
+	pybind11::class_<SessionListMessage, 
+		std::shared_ptr<SessionListMessage>>(m, "SessionListMessage")
 		.def(pybind11::init<>())
 		.def("ParseContent", &SessionListMessage::ParseContent)
 		.def("ToString", &SessionListMessage::ToString)
-		.def("SetPlayGetSessionNameserName", &SessionListMessage::GetSessionNames);
+		.def("GetSessionNames", &SessionListMessage::GetSessionNames);
+
+
+	pybind11::class_<SessionInformationMessage, 
+		std::shared_ptr<SessionInformationMessage>>(m, "SessionInformationMessage")
+		.def(pybind11::init<>())
+		.def("ParseContent", &SessionInformationMessage::ParseContent)
+		.def("ToString", &SessionInformationMessage::ToString)
+		.def("GetOppoName", &SessionInformationMessage::GetOppoName)
+		.def("IsHost", &SessionInformationMessage::IsHost);
+
+
+	pybind11::class_<JoinSessionMessage, 
+		std::shared_ptr<JoinSessionMessage>>(m, "JoinSessionMessage")
+		.def(pybind11::init<>())
+		.def("ParseContent", &JoinSessionMessage::ParseContent)
+		.def("ToString", &JoinSessionMessage::ToString)
+		.def("SetSessionName", &JoinSessionMessage::SetSessionName);
+
+	pybind11::class_<GamestartRequestMessage, 
+		std::shared_ptr<GamestartRequestMessage>>(m, "GamestartRequestMessage")
+		.def(pybind11::init<>())
+		.def("ParseContent", &GamestartRequestMessage::ParseContent)
+		.def("ToString", &GamestartRequestMessage::ToString);
+
+	pybind11::class_<LeaveSessionMessage, 
+		std::shared_ptr<LeaveSessionMessage>>(m, "LeaveSessionMessage")
+		.def(pybind11::init<>())
+		.def("ParseContent", &LeaveSessionMessage::ParseContent)
+		.def("ToString", &LeaveSessionMessage::ToString);
 
 
 	pybind11::enum_<MessageStringResult>(m, "MessageStringResult")

@@ -33,8 +33,12 @@ private:
 	// Handle join session requests
 	void _handleJoinSession();
 
+	// Sends session information messages
+	// to connections in sessions
+	void _sendSessionInformation();
+
 	// Handle start requests
-	void _handleStartSession();
+	void _handleStartAndLeaveSession();
 
 	int _addToExistingSession(
 		std::string inSessionNameToJoin,

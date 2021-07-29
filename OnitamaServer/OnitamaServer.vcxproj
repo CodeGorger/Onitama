@@ -137,6 +137,7 @@
       <PreprocessorDefinitions>DEBUGLOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)OnitamaEngine\Source;$(SolutionDir)OnitamaMessages\Source;C:\Users\Simon\Desktop\Onitama\Onitama\OnitamaServer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

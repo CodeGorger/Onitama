@@ -2,6 +2,7 @@
 #include "LobbyThread.h"
 #include <iostream>
 #include <OnitamaMessages.h>
+#include <Messages/SessionInformation/SessionInformationMessage.h>
 
 void LobbyThread::SetConnectionInputQueue(
     ThreadSafeQueue<std::shared_ptr<ConnEntity>>
@@ -9,7 +10,7 @@ void LobbyThread::SetConnectionInputQueue(
 {
     l = spdlog::stdout_color_mt("LobbyThread");
 #ifdef DEBUGLOGGING
-    l->set_level(spdlog::level::debug);
+    //l->set_level(spdlog::level::debug);
 #endif
     _ungreetedConnections = inUngreetedConnectionsQueue;
     _lobbyConnections = ThreadSafeQueue< std::shared_ptr<ConnEntity>>();
@@ -61,6 +62,7 @@ void LobbyThread::_timedLoop()
 // Will execute _timedDo() maximally 1 each second
 void LobbyThread::_timedDo()
 {
+
     // Takes new connections that have greeted properly
     _checkUngreetedNewEntities();
 
@@ -70,11 +72,15 @@ void LobbyThread::_timedDo()
     // Handle join session requests
     _handleJoinSession();
 
+    // Will send the session info to connections in sessions
+    _sendSessionInformation();
+    
     // Handle start requests
-    _handleStartSession();
+    _handleStartAndLeaveSession();
 
     // Remove closed connections
     _removedClosedConnections();
+
 }
 
 
@@ -106,18 +112,22 @@ void LobbyThread::_sendSessionList()
     l->debug("_sendSessionList");
     SessionListMessage m = SessionListMessage();
 
+    //m.AddSessionName("Test");
+    //m.AddSessionName("TestXXX");
+
     for (unsigned int i = 0; i < _unstartedGameSessionList.Size(); i++)
     {
         //TODO(Simon): What is the limit for sessions in one message?
         m.AddSessionName(_unstartedGameSessionList.Get(i)->GetSessionName());
     }
+
     for (unsigned int i = 0; i < _lobbyConnections.Size(); i++)
     {
         _lobbyConnections.Get(i)->Send(m.ToString());
     }
     if (0 < _lobbyConnections.Size())
     {
-        l->info("Created a SessionListMessage with {0} entries. Sent it to {1} lobby connections. ",
+        l->debug("Created a SessionListMessage with {0} entries. Sent it to {1} lobby connections. ",
             _unstartedGameSessionList.Size(),
             _lobbyConnections.Size());
     }
@@ -178,25 +188,100 @@ void LobbyThread::_handleJoinSession()
     }
 }
 
+// TODO(Simon): Check what the server does if PlayerA leaves and
+//              the game hasn't started. Will PlayerB be moved to
+//              PlayerA? Will the session be closed properly if there is no B?
 
-void LobbyThread::_handleStartSession()
+// TODO(Simon): Players may not be called "Empty"
+
+// TODO(Simon): Any player or gamesession may not have a ';', ':' or ','
+//              in its name
+
+void LobbyThread::_sendSessionInformation()
+{
+    l->debug("_unstartedGameSessionList");
+    for (unsigned int is = 0; is < _unstartedGameSessionList.Size(); is++)
+    {
+        std::string playerAName = "Empty";
+        std::string playerBName = "Empty";
+        std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(is);
+        SessionInformationMessage simsg = SessionInformationMessage();
+        // PlayerA ist always host ... 
+        if (gs->GetPlayerA())
+        {
+            playerAName = gs->GetPlayerA()->GetPlayername();
+        }
+        if (gs->GetPlayerB())
+        {
+            simsg.SetIsHost(false);
+            simsg.SetOppoName(playerAName);
+            gs->GetPlayerB()->Send(simsg.ToString());
+            playerBName = gs->GetPlayerB()->GetPlayername();
+        }
+        if (gs->GetPlayerA())
+        {
+            simsg.SetIsHost(true);
+            simsg.SetOppoName(playerBName);
+            gs->GetPlayerA()->Send(simsg.ToString());
+        }
+    }
+}
+
+
+void LobbyThread::_handleStartAndLeaveSession()
 {
     l->debug("_handleStartSession");
     for (unsigned int is = 0; is < _unstartedGameSessionList.Size(); is++)
     {
         std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(is);
-        bool ssession = gs->ReadStartRequestSessionMessage();
-        if (ssession)
+        int result = gs->ReadStartRequestAndLeaveSessionMessages();
+
+        switch (result)
         {
-            l->info("Session {0} with User {1} and {2} has been started.",
+        case -1:// B wishes to leave the session
+            l->info("User {0} (B) left session {1}.",
+                gs->GetPlayerB()->GetPlayername(),
+                gs->GetSessionName());
+            _lobbyConnections.Enque(gs->GetPlayerB());
+
+            gs->SetConnEntityB(nullptr);
+            break;
+
+        case -2:// A wishes to leave the session
+            l->info("User {0} (A) left session {1}.",
+                gs->GetPlayerA()->GetPlayername(),
+                gs->GetSessionName());
+            _lobbyConnections.Enque(gs->GetPlayerA());
+            gs->SetConnEntityA(nullptr);
+
+            // Player B will be moved to slot A in _removedClosedConnections()
+            // Session will evtl be removed in _removedClosedConnections()
+            break;
+
+        case -3:// A & B wishes to leave the session
+            l->info("Session {0} will be closed, user {1} and {2} left.",
+                gs->GetSessionName(),
+                gs->GetPlayerA()->GetPlayername(),
+                gs->GetPlayerB()->GetPlayername());
+            _lobbyConnections.Enque(gs->GetPlayerA());
+            _lobbyConnections.Enque(gs->GetPlayerB());
+            _unstartedGameSessionList.Remove(is);
+            is--;
+            break;
+
+        case -4:// A wishes to start the session
+            l->info("Session {0} with user {1} and {2} has been started.",
                 gs->GetSessionName(),
                 gs->GetPlayerA()->GetPlayername(),
                 gs->GetPlayerB()->GetPlayername());
             _launchedGameSessionList.Enque(gs);
             _unstartedGameSessionList.Remove(is);
             is--;
+            // TODO(Simon): GameThread must be started here !!!
 
-            //TODO(Simon): GameThread must be started here !!!
+            break;
+        default:
+            break;
         }
     }
 }
@@ -224,7 +309,7 @@ int LobbyThread::_addToExistingSession(
                 return 2;
             }
 
-            _unstartedGameSessionList.Get(is)->SetConnEntityA(
+            _unstartedGameSessionList.Get(is)->SetConnEntityB(
                 _lobbyConnections.Get(inConnectionIdInLobbyConnectionLost));
 
             _lobbyConnections.Remove(inConnectionIdInLobbyConnectionLost);
@@ -242,8 +327,9 @@ void LobbyThread::_createNewSession(
 {
     l->debug("_createNewSession");
     std::shared_ptr<GameSession> newGameSession;
+    newGameSession = std::make_shared<GameSession>();
     newGameSession->SetSessionName(inSessionToJoin);
-    newGameSession->SetConnEntityB(
+    newGameSession->SetConnEntityA(
         _lobbyConnections.Get(inConnectionIdInLobbyConnectionLost));
     _unstartedGameSessionList.Enque(newGameSession);
     _lobbyConnections.Remove(
@@ -252,32 +338,85 @@ void LobbyThread::_createNewSession(
 
 void LobbyThread::_removedClosedConnections()
 {
-    for (int i = 0; i < _ungreetedConnections.Size(); i++)
+    // Remove all unproperly closed connections
+    // that haven't greeted yet
+    for (unsigned int i = 0; i < _ungreetedConnections.Size(); i++)
     {
         if (_ungreetedConnections.Get(i)->IsClosed())
         {
+            l->info("Removing user {0}.", 
+                _ungreetedConnections.Get(i)->GetPlayername());
             _ungreetedConnections.Remove(i);
             i--;
         }
     }
 
-    for (int i = 0; i < _lobbyConnections.Size(); i++)
+    // Remove all unproperly closed connections
+    // that resided in the lobby
+    for (unsigned int i = 0; i < _lobbyConnections.Size(); i++)
     {
         if (_lobbyConnections.Get(i)->IsClosed())
         {
+            l->info("Removing user {0}.",
+                _lobbyConnections.Get(i)->GetPlayername());
             _lobbyConnections.Remove(i);
             i--;
         }
     }
 
-    for (int i = 0; i < _unstartedGameSessionList.Size(); i++)
+    // Remove all closed sessions
+    for (unsigned int i = 0; i < _unstartedGameSessionList.Size(); i++)
     {
-        if (_unstartedGameSessionList.Get(i)->CheckConnectionsIfClosed())
+        std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(i);
+        if (gs->CheckConnectionsIfClosed())
         {
+            l->info("Removing session {0}.",
+                gs->GetSessionName());
             _unstartedGameSessionList.Remove(i);
             i--;
         }
     }
+
+    // Remove all unproperly closed connections in sessions
+    for (unsigned int i = 0; i < _unstartedGameSessionList.Size(); i++)
+    {
+        std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(i);
+        std::shared_ptr<ConnEntity> a = gs->GetPlayerA();
+        std::shared_ptr<ConnEntity> b = gs->GetPlayerB();
+        if (a && a->IsClosed())
+        {
+            l->info("Removing user {0} from session {1} and server.",
+                a->GetPlayername(),
+                gs->GetSessionName());
+            gs->SetConnEntityA(nullptr);
+        }
+        if (b && b->IsClosed())
+        {
+            l->info("Removing user {0} from session {1} and server.",
+                b->GetPlayername(),
+                gs->GetSessionName());
+            gs->SetConnEntityB(nullptr);
+        }
+    }
+
+    // Move a B player to slot A if A is empty
+    for (unsigned int i = 0; i < _unstartedGameSessionList.Size(); i++)
+    {
+        std::shared_ptr<GameSession> gs = _unstartedGameSessionList.Get(i);
+        if (nullptr == gs->GetPlayerA())
+        {
+            l->info("Promoting user {0} to the host of session {1}.",
+                gs->GetPlayerB()->GetPlayername(),
+                gs->GetSessionName());
+            // Guest is now host.
+            gs->SetConnEntityA(gs->GetPlayerB());
+            gs->SetConnEntityB(nullptr);
+        }
+    }
+
+    // TODO(Simon): What if a A (or B) player left and B hasnt been moved to
+    // Slot A yet. And in that moment a third player will try to join?
+
 }
 
 void LobbyThread::_handleOpenSessionTimeout()

@@ -84,7 +84,6 @@ class GameView:
         textOwnCardPrev.place(x=320, y=200, width=100, height=100)
 
 
-
         buttonSubmitTurn = Button(master=self._tkOnitamaClientWindow,
                                text="Submit Turn",
                                command=self._buttonSubmitTurn)
@@ -98,9 +97,9 @@ class GameView:
 
         # self._sessionListThread = threading.Thread(target=self._processingSessionListMsg)
         # self._sessionListThread.start()
-        #
+
         self._tkOnitamaClientWindow.mainloop()
-        #
+
         # if (101==self._quitStatus or 100==self._quitStatus):
         #     self._serverSocket.close()
         #

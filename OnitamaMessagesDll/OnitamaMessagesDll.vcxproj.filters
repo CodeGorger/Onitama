@@ -49,6 +49,12 @@
     <ClCompile Include="..\OnitamaMessages\Source\PyBindMessagesApi.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\SessionInformation\SessionInformationMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OnitamaMessages\Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OnitamaMessages\Source\MessageParser.h">
@@ -91,6 +97,12 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\OnitamaMessages\Source\Messages\Gameover\GameoverMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\SessionInformation\SessionInformationMessage.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OnitamaMessages\Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

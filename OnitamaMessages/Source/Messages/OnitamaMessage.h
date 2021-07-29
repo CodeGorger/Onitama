@@ -4,7 +4,7 @@
 #include <string>
 #include "CutParameterDto.h"
 
-class OnitamaMessage
+class OnitamaMessage //: public std::enable_shared_from_this<OnitamaMessage>
 {
 public:
 	OnitamaMessage(std::string inMessageName, unsigned int inMaxLegalLength);

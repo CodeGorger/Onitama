@@ -2,7 +2,7 @@ import time
 import threading
 from tkinter import *
 import socket
-import fcntl, os
+#import fcntl, os
 import OnitamaMessages
 
 
@@ -27,7 +27,8 @@ class DisconnectedView:
                 socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # now connect to the server
             self._serverSocket.connect((inIpAddress, int(inPort)))
-            fcntl.fcntl(self._serverSocket, fcntl.F_SETFL, os.O_NONBLOCK)
+            self._serverSocket.setblocking(0)
+            # fcntl.fcntl(self._serverSocket, fcntl.F_SETFL, os.O_NONBLOCK)
             return 0
 
         except OSError as err:

@@ -2,6 +2,7 @@
 #include "ConnEntity.h"
 #include <iostream>
 #include <OnitamaMessages.h>
+#include <Messages/LeaveSessionMessage/LeaveSessionMessage.h>
 
 
 ConnEntity::ConnEntity()
@@ -73,14 +74,20 @@ ConnEntity::ConnEntity(const ConnEntity& rhs)
 //       2: Failure, drop connection, stop thread
 int ConnEntity::ReadGreetingMessage()
 {
-    _readIncomingTcp();
+    if (_readIncomingTcp())
+    {
+        l->warn("3 Closing socket {0}.", _s);
+        _isClosed = true;
+        closesocket(_s);
+        return 2;
+    }
 
     MessageParsedDTO mesResult=ParseMessage(_currentMessageBuffer);
 
     switch (mesResult.GetResult())
     {
     case MessageStringResult::MessageStringResult_Complete:
-
+        _currentMessageBuffer = mesResult.GetRest();
         break;
     case MessageStringResult::MessageStringResult_PossibleBeginning:
         // Do nothing ...
@@ -89,6 +96,8 @@ int ConnEntity::ReadGreetingMessage()
     default:
     //case MessageStringResult::MessageStringResult_Trash:
     //case MessageStringResult::MessageStringResult_TooLong:
+        l->warn("4 Closing socket {0}.", _s);
+        _isClosed = true;
         closesocket(_s);
         return 2;
         break;
@@ -103,7 +112,6 @@ int ConnEntity::ReadGreetingMessage()
     }
     _hasGreeted = true;
     _playerName = gMes->GetPlayerName();
-    _currentMessageBuffer = mesResult.GetRest();
     return 0;
 }
 
@@ -113,14 +121,20 @@ int ConnEntity::ReadGreetingMessage()
 //       2: Failure, drop connection, stop thread
 ReadJoinSessionDto ConnEntity::ReadJoinSessionMessage()
 {
-    _readIncomingTcp();
+    if (_readIncomingTcp())
+    {
+        l->warn("1 Closing socket {0}.", _s);
+        _isClosed = true;
+        closesocket(_s);
+        return ReadJoinSessionDto(2);
+    }
 
     MessageParsedDTO mesResult = ParseMessage(_currentMessageBuffer);
 
     switch (mesResult.GetResult())
     {
     case MessageStringResult::MessageStringResult_Complete:
-
+        _currentMessageBuffer = mesResult.GetRest();
         break;
     case MessageStringResult::MessageStringResult_PossibleBeginning:
         // Do nothing ...
@@ -129,7 +143,8 @@ ReadJoinSessionDto ConnEntity::ReadJoinSessionMessage()
     default:
         //case MessageStringResult::MessageStringResult_Trash:
         //case MessageStringResult::MessageStringResult_TooLong:
-        l->warn("Closing socket {0}.", _s);
+        l->warn("2 Closing socket {0}.", _s);
+        _isClosed = true;
         closesocket(_s);
         return ReadJoinSessionDto(2);
         break;
@@ -148,19 +163,27 @@ ReadJoinSessionDto ConnEntity::ReadJoinSessionMessage()
 
 
 
-//return 0: Success
-//       1: No success no failure
-//       2: Failure, drop connection, stop thread
-int ConnEntity::ReadStartRequestSessionMessage()
+//TODO(Simon): This should be an enum...
+//return -2: Success, Gamestart Request
+//       -1: Success, Leave Session 
+//        1: No success no failure
+//        2: Failure, drop connection, stop thread
+int ConnEntity::ReadStartRequestAndLeaveSessionMessage()
 {
-    _readIncomingTcp();
+    if (_readIncomingTcp())
+    {
+        l->warn("5 Closing socket {0}.", _s);
+        _isClosed = true;
+        closesocket(_s);
+        return 2;
+    }
 
     MessageParsedDTO mesResult = ParseMessage(_currentMessageBuffer);
 
     switch (mesResult.GetResult())
     {
     case MessageStringResult::MessageStringResult_Complete:
-
+        _currentMessageBuffer = mesResult.GetRest();
         break;
     case MessageStringResult::MessageStringResult_PossibleBeginning:
         // Do nothing ...
@@ -169,6 +192,8 @@ int ConnEntity::ReadStartRequestSessionMessage()
     default:
         //case MessageStringResult::MessageStringResult_Trash:
         //case MessageStringResult::MessageStringResult_TooLong:
+        l->warn("6 Closing socket {0}.", _s);
+        _isClosed = true;
         closesocket(_s);
         return 2;
         break;
@@ -177,23 +202,35 @@ int ConnEntity::ReadStartRequestSessionMessage()
     OnitamaMessage* oMes = mesResult.GetOnitamaMessage().get();
     GamestartRequestMessage* gMes =
         dynamic_cast<GamestartRequestMessage*>(oMes);
-    if (0 == gMes)
+    LeaveSessionMessage* lMes =
+        dynamic_cast<LeaveSessionMessage*>(oMes);
+    if (0 != gMes)
     {
-        return 3;
+        return -2;
     }
-    return 0;
+    if (0 != lMes)
+    {
+        return -1;
+    }
+    return 3;
 }
 
 ReadMoveInfoDto ConnEntity::ReadMoveInfo()
 {
-    _readIncomingTcp();
+    if (_readIncomingTcp())
+    {
+        l->warn("7 Closing socket {0}.", _s);
+        _isClosed = true;
+        closesocket(_s);
+        return ReadMoveInfoDto(2);
+    }
 
     MessageParsedDTO mesResult = ParseMessage(_currentMessageBuffer);
 
     switch (mesResult.GetResult())
     {
     case MessageStringResult::MessageStringResult_Complete:
-
+        _currentMessageBuffer = mesResult.GetRest();
         break;
     case MessageStringResult::MessageStringResult_PossibleBeginning:
         // Do nothing ...
@@ -202,6 +239,8 @@ ReadMoveInfoDto ConnEntity::ReadMoveInfo()
     default:
         //case MessageStringResult::MessageStringResult_Trash:
         //case MessageStringResult::MessageStringResult_TooLong:
+        l->warn("8 Closing socket {0}.", _s);
+        _isClosed = true;
         closesocket(_s);
         return ReadMoveInfoDto(2);
         break;
@@ -227,10 +266,7 @@ ReadMoveInfoDto ConnEntity::ReadMoveInfo()
 
 void ConnEntity::Send(std::string inMessage)
 {
-
     int result = send(_s, inMessage.c_str(), (int)inMessage.length(), 0);
-
-
 }
 
 
@@ -241,14 +277,17 @@ bool ConnEntity::IsInited()
 
 
 
-
-void ConnEntity::_readIncomingTcp()
+// Will return true if the socket was closed somehow
+bool ConnEntity::_readIncomingTcp()
 {
+    bool ret = false;
+    std::fill_n(_recvbuf, _recvbuflen, 0);
     int result = recv(_s, _recvbuf, _recvbuflen, 0);
 
     if (result == 0)
     {
         l->warn("Socket was closed.");
+        ret = true;
     }
     else if (result < 0)
     {
@@ -265,6 +304,18 @@ void ConnEntity::_readIncomingTcp()
         {
         case 10035:
             break;
+        case 10038:
+            l->warn("Socket was closed (10038 - WSAENOTSOCK).");
+            ret = true;
+            break;
+        case 10053:
+            l->warn("Socket was closed (10053 - WSAECONNABORTED).");
+            ret = true;
+            break;
+        case 10054:
+            l->warn("Socket was closed (10054 - WSAECONNRESET).");
+            ret = true;
+            break;
         default:
             l->warn("recv failed with error: {0}.",
                 err_num);
@@ -275,4 +326,5 @@ void ConnEntity::_readIncomingTcp()
     {
         _currentMessageBuffer += _recvbuf;
     }
+    return ret;
 }

@@ -27,8 +27,21 @@ public:
 	ConnEntity(SOCKET inS);
 	ConnEntity(const ConnEntity&);
 	int ReadGreetingMessage();
+
+
+	//return 0: Success
+	//       1: No success no failure
+	//       2: Failure, drop connection, stop thread
 	ReadJoinSessionDto ReadJoinSessionMessage();
-	int ReadStartRequestSessionMessage();
+
+
+	//return -2: Success, Gamestart Request
+	//       -1: Success, Leave Session 
+	//        1: No success no failure
+	//        2: Failure, drop connection, stop thread
+	int ReadStartRequestAndLeaveSessionMessage();
+
+
 	ReadMoveInfoDto ReadMoveInfo();
 	void Send(std::string inMessage);
 	bool IsInited();
@@ -78,7 +91,8 @@ private:
 
 	bool _isInitedProperly;
 
-	void _readIncomingTcp();
+	// Will return true if the socket was closed somehow
+	bool _readIncomingTcp();
 
 	std::string _ip;
 	std::string _port;

@@ -12,7 +12,15 @@ public:
 	void SetSessionName(std::string inSessionName);
 	void SetConnEntityA(std::shared_ptr<ConnEntity> inConnectionEntity);
 	void SetConnEntityB(std::shared_ptr<ConnEntity> inConnectionEntity);
-	bool ReadStartRequestSessionMessage();
+	
+	//TODO(Simon): This should be an enum...
+	// -1 ... B wishes to leave the session
+	// -2 ... A wishes to leave the session
+	// -3 ... A & B wishes to leave the session
+	// -4 ... A wishes to start the session
+	//  1 ... Error
+	int ReadStartRequestAndLeaveSessionMessages();
+
 	bool HasTwoPlayer();
 
 	std::shared_ptr<ConnEntity> GetPlayerA();
@@ -36,6 +44,9 @@ private:
 	// the one joined last
 	// Player Blue
 	std::shared_ptr<ConnEntity> _connEntityB;
+
+
+	std::shared_ptr<spdlog::logger> l;
 };
 
 #endif

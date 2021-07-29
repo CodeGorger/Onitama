@@ -5,12 +5,20 @@
 #include "AcceptThread/AcceptThread.h"
 #include "LobbyThread/LobbyThread.h"
 
-
-//TODO(Simon): At some point it is important to have the threads not 
-//             run on any std::queue<T> but to make it thread proof.
-
 int main()
 {
+
+    //std::string inMessageContent = "";
+    //int firstComma = inMessageContent.find_first_of(',');
+    //std::cout << firstComma << std::endl;
+    //std::string cutParameter = inMessageContent.substr(0, firstComma);
+    //std::cout << cutParameter << std::endl;
+    //std::string contentRest = inMessageContent.substr(firstComma + 1);
+    //std::cout << contentRest << std::endl;
+
+
+
+
     AcceptThread acceptThread = AcceptThread();
     acceptThread.Start();
 

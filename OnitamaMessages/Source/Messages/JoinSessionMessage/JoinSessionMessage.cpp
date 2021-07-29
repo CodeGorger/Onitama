@@ -8,6 +8,22 @@ JoinSessionMessage::JoinSessionMessage()
 
 }
 
+
+
+std::string JoinSessionMessage::GetSessionName()
+{
+	return _sessionName;
+}
+
+void JoinSessionMessage::SetSessionName(std::string inSessionName)
+{
+	_sessionName = inSessionName;
+}
+
+
+
+
+
 void JoinSessionMessage::ParseContent(std::string inMessageContent)
 {
 	CutParameterDto cp = CutNextParameter(inMessageContent);
@@ -21,7 +37,7 @@ void JoinSessionMessage::ParseContent(std::string inMessageContent)
 	return;
 }
 
-std::string JoinSessionMessage::GetSessionName()
+std::string JoinSessionMessage::ToString()
 {
-	return _sessionName;
+	return _messageName + ":" + _sessionName + ",;";
 }

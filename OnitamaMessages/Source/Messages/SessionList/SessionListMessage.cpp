@@ -22,17 +22,24 @@ std::vector<std::string> SessionListMessage::GetSessionNames()
 
 std::string SessionListMessage::ToString()
 {
-	std::string ret;
+	std::string ret  = _messageName+":";
 	for (int i = 0; i < _sessionNames.size(); i++)
 	{
 		ret+=_sessionNames[i]+",";
 	}
+	ret += ";";
 	return ret;
 }
 
 
 void SessionListMessage::ParseContent(std::string inMessageContent)
 {
-	//TODO(Simon): Write this!
+	CutParameterDto cp = CutNextParameter(inMessageContent);
+	while(cp.GetSuccessStatus())
+	{
+		_sessionNames.push_back(cp.GetParameter());
+		cp = CutNextParameter(cp.GetContentRest());		
+	}
+
 	return ;
 }

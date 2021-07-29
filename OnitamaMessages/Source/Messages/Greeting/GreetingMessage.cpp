@@ -10,19 +10,6 @@ GreetingMessage::GreetingMessage()
 }
 
 
-void GreetingMessage::ParseContent(std::string inMessageContent)
-{
-	CutParameterDto cp=CutNextParameter(inMessageContent);
-	if (!cp.GetSuccessStatus())
-	{
-		//return "";
-		return;
-	}
-	_playerName = cp.GetParameter();
-	//return cp.GetContentRest();
-	return;
-}
-
 
 std::string GreetingMessage::GetPlayerName()
 {
@@ -37,4 +24,18 @@ void GreetingMessage::SetPlayerName(std::string inPlayerName)
 std::string GreetingMessage::ToString()
 {
 	return _messageName + ":" + _playerName + ",;";
+}
+
+
+void GreetingMessage::ParseContent(std::string inMessageContent)
+{
+	CutParameterDto cp = CutNextParameter(inMessageContent);
+	if (!cp.GetSuccessStatus())
+	{
+		//return "";
+		return;
+	}
+	_playerName = cp.GetParameter();
+	//return cp.GetContentRest();
+	return;
 }

@@ -16,8 +16,15 @@ public:
 	bool GetSuccessStatus();
 
 private:
+	// The cut away parameter string of the message
 	std::string _cutParameter;
+
+	// The message rest that has been cut away from
 	std::string _contentRest;
+
+	// A general return code about success of failure
+	// true ... success
+	// false ... failure
 	bool _status;
 
 };

@@ -8,7 +8,10 @@
 #include "Messages/InvalidMove/InvalidMoveMessage.h"
 #include "Messages/Gameover/GameoverMessage.h"
 #include "Messages/Move/MoveMessage.h"
-#include <iostream>
+#include "Messages/SessionList/SessionListMessage.h"
+#include "Messages/JoinSessionMessage/JoinSessionMessage.h"
+#include "Messages/SessionInformation/SessionInformationMessage.h"
+#include "Messages/LeaveSessionMessage/LeaveSessionMessage.h"
 
 #define MAX_MSG_NAME_LENGTH 30
 #define MAX_MSG_LENGTH 1024
@@ -78,6 +81,7 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 		return ret;
 	}
 
+	// It is certain now that we found a ';'
 
 	int firstColonPos = inMessageString.find_first_of(':');
 	if (-1 == firstColonPos)
@@ -102,12 +106,14 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 			firstSemicolonPos - firstColonPos);
 
 	// Also already cut of the rest of the message 
-	// (which might be imcomplete, wrong or any
+	// (which might be incomplete, wrong or any
 	// number of later received messages).
 	std::string restString =
 		inMessageString.substr(
 			firstSemicolonPos + 1);
 
+	//TODO(Simon): This should be with a loop
+	//             Each messagetype should signup here
 	if (tmpMessageName == "Greeting")
 	{
 		ret.SetMessage(
@@ -144,6 +150,31 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 			std::make_unique<GameoverMessage>(
 				GameoverMessage()));
 	}
+	else if (tmpMessageName == "SessionList")
+	{
+		ret.SetMessage(
+			std::make_unique<SessionListMessage>(
+				SessionListMessage()));
+	}
+	else if (tmpMessageName == "JoinSession")
+	{
+		ret.SetMessage(
+			std::make_unique<JoinSessionMessage>(
+				JoinSessionMessage()));
+	}
+	else if (tmpMessageName == "SessionInformation")
+	{
+		ret.SetMessage(
+			std::make_unique<SessionInformationMessage>(
+				SessionInformationMessage()));
+	}
+	else if (tmpMessageName == "LeaveSession")
+	{
+		ret.SetMessage(
+			std::make_unique<LeaveSessionMessage>(
+				LeaveSessionMessage()));
+	}
+	
 
 	ret.GetOnitamaMessage()->ParseContent(tmpContent);
 	ret.SetRest(restString);
