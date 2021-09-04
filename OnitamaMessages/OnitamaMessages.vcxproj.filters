@@ -18,28 +18,7 @@
     <ClCompile Include="Source\MessageParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Messages\Gameover\GameoverMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\Gamestart\GamestartMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\GamestartRequest\GamestartRequestMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\Greeting\GreetingMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\InvalidMove\InvalidMoveMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\Move\MoveMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Messages\OnitamaMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messages\SessionList\SessionListMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Messages\CutParameterDto.cpp">
@@ -57,10 +36,34 @@
     <ClCompile Include="Source\PyBindMessagesApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Messages\SessionInformation\SessionInformationMessage.cpp">
+    <ClCompile Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp">
+    <ClCompile Include="Source\Messages\StaticOnitamaMessageCtor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\SessionListMessage\SessionListMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\SessionInformationMessage\SessionInformationMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\MoveMessage\MoveMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\InvalidMoveMessage\InvalidMoveMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\GreetingMessage\GreetingMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\GamestartRequestMessage\GamestartRequestMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\GamestartMessage\GamestartMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messages\GameoverMessage\GameoverMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,28 +74,7 @@
     <ClInclude Include="Source\Messages\OnitamaMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Messages\Gameover\GameoverMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\Gamestart\GamestartMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\GamestartRequest\GamestartRequestMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\Greeting\GreetingMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\InvalidMove\InvalidMoveMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\Move\MoveMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\OnitamaMessages.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messages\SessionList\SessionListMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Messages\CutParameterDto.h">
@@ -107,10 +89,34 @@
     <ClInclude Include="Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Messages\SessionInformation\SessionInformationMessage.h">
+    <ClInclude Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h">
+    <ClInclude Include="Source\Messages\StaticOnitamaMessageCtor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\SessionListMessage\SessionListMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\SessionInformationMessage\SessionInformationMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\MoveMessage\MoveMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\InvalidMoveMessage\InvalidMoveMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\GreetingMessage\GreetingMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\GamestartRequestMessage\GamestartRequestMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\GamestartMessage\GamestartMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messages\GameoverMessage\GameoverMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

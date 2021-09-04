@@ -1,8 +1,11 @@
 
 #include "TimeoutWarningMessage.h"
 
+StaticOnitamaMessageCtor TimeoutWarningMessage::_staticCtor =
+StaticOnitamaMessageCtor(std::string("TimeoutWarning"), TimeoutWarningMessage::CreateSelf);
+
 TimeoutWarningMessage::TimeoutWarningMessage()
-	:OnitamaMessage("Gameover", 40)
+	:OnitamaMessage("TimeoutWarning", 40)
 	, _turnTimeLeftInS(60)
 	, _turnTimeLimitInS(60)
 	, _gameTimeLeftInS(600)
@@ -55,6 +58,11 @@ std::string TimeoutWarningMessage::ToString()
 	ret += std::to_string(_gameTimeLeftInS ) + ",";
 	ret += std::to_string(_gameTimeLimitInS) + ",;";
 	return ret;
+}
+
+std::shared_ptr<OnitamaMessage> TimeoutWarningMessage::CreateSelf()
+{
+	return std::make_shared<TimeoutWarningMessage>();
 }
 
 

@@ -250,10 +250,46 @@ bool OnitamaEngine::_foundRedMaster()
     return false;
 }
 
+
+Card OnitamaEngine::_getCard(std::string inCardName)
+{
+    for (int i = 0; i < _allCards.size(); i++)
+    {
+        if (_allCards[i].GetName() == inCardName)
+        {
+            return _allCards[i];
+        }
+    }
+    return Card();
+}
+
 std::string OnitamaEngine::GetEngineStatus()
 {
     return _engineStatus;
 }
+
+
+void OnitamaEngine::SetCurrentCardsRed(std::string inCard1, std::string inCard2)
+{
+    _currentCardsRed = std::vector<Card>();
+    _currentCardsRed.push_back(_getCard(inCard1));
+    _currentCardsRed.push_back(_getCard(inCard2));
+}
+
+
+void OnitamaEngine::SetCurrentCardsBlue(std::string inCard1, std::string inCard2)
+{
+    _currentCardsBlue = std::vector<Card>();
+    _currentCardsBlue.push_back(_getCard(inCard1));
+    _currentCardsBlue.push_back(_getCard(inCard2));
+}
+
+
+void OnitamaEngine::SetCurrentCardCenter(std::string inCard)
+{
+    _currentCardCenter = _getCard(inCard);
+}
+
 
 bool OnitamaEngine::ValidateMove(
     bool inIsPlayerRed,
@@ -424,7 +460,7 @@ bool OnitamaEngine::HasBlueLost_MasterTaken()
 
 bool OnitamaEngine::HasRedLost_ThroneTaken()
 {
-    if (_currentBoardState[5][2] == _redMaster)
+    if (_currentBoardState[4][2] == _redMaster)
     {
         return true;
     }

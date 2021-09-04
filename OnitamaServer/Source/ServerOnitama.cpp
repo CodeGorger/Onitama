@@ -7,18 +7,6 @@
 
 int main()
 {
-
-    //std::string inMessageContent = "";
-    //int firstComma = inMessageContent.find_first_of(',');
-    //std::cout << firstComma << std::endl;
-    //std::string cutParameter = inMessageContent.substr(0, firstComma);
-    //std::cout << cutParameter << std::endl;
-    //std::string contentRest = inMessageContent.substr(firstComma + 1);
-    //std::cout << contentRest << std::endl;
-
-
-
-
     AcceptThread acceptThread = AcceptThread();
     acceptThread.Start();
 

@@ -2,16 +2,6 @@
 #include "MessageParser.h"
 
 #include "Messages/OnitamaMessage.h"
-#include "Messages/Greeting/GreetingMessage.h"
-#include "Messages/GamestartRequest/GamestartRequestMessage.h"
-#include "Messages/Gamestart/GamestartMessage.h"
-#include "Messages/InvalidMove/InvalidMoveMessage.h"
-#include "Messages/Gameover/GameoverMessage.h"
-#include "Messages/Move/MoveMessage.h"
-#include "Messages/SessionList/SessionListMessage.h"
-#include "Messages/JoinSessionMessage/JoinSessionMessage.h"
-#include "Messages/SessionInformation/SessionInformationMessage.h"
-#include "Messages/LeaveSessionMessage/LeaveSessionMessage.h"
 
 #define MAX_MSG_NAME_LENGTH 30
 #define MAX_MSG_LENGTH 1024
@@ -112,67 +102,16 @@ MessageParsedDTO ParseMessage(std::string inMessageString)
 		inMessageString.substr(
 			firstSemicolonPos + 1);
 
-	//TODO(Simon): This should be with a loop
-	//             Each messagetype should signup here
-	if (tmpMessageName == "Greeting")
+	if (StaticOnitamaMessageCtor::HasMessage(tmpMessageName))
 	{
-		ret.SetMessage(
-			std::make_unique<GreetingMessage>(
-				GreetingMessage()));
+		std::shared_ptr<OnitamaMessage> tmpMsg;
+		tmpMsg = StaticOnitamaMessageCtor::GetMessageCreator(tmpMessageName)();
+		ret.SetMessage(tmpMsg);
 	}
-	else if (tmpMessageName == "GamestartRequest")
+	else
 	{
-		ret.SetMessage(
-			std::make_unique<GamestartRequestMessage>(
-				GamestartRequestMessage()));
-	}
-	else if (tmpMessageName == "Gamestart")
-	{
-		ret.SetMessage(
-			std::make_unique<GamestartMessage>(
-				GamestartMessage()));
-	}
-	else if (tmpMessageName == "InvalidMove")
-	{
-		ret.SetMessage(
-			std::make_unique<InvalidMoveMessage>(
-				InvalidMoveMessage()));
-	}
-	else if (tmpMessageName == "Move")
-	{
-		ret.SetMessage(
-			std::make_unique<MoveMessage>(
-				MoveMessage()));
-	}
-	else if (tmpMessageName == "Gameover")
-	{
-		ret.SetMessage(
-			std::make_unique<GameoverMessage>(
-				GameoverMessage()));
-	}
-	else if (tmpMessageName == "SessionList")
-	{
-		ret.SetMessage(
-			std::make_unique<SessionListMessage>(
-				SessionListMessage()));
-	}
-	else if (tmpMessageName == "JoinSession")
-	{
-		ret.SetMessage(
-			std::make_unique<JoinSessionMessage>(
-				JoinSessionMessage()));
-	}
-	else if (tmpMessageName == "SessionInformation")
-	{
-		ret.SetMessage(
-			std::make_unique<SessionInformationMessage>(
-				SessionInformationMessage()));
-	}
-	else if (tmpMessageName == "LeaveSession")
-	{
-		ret.SetMessage(
-			std::make_unique<LeaveSessionMessage>(
-				LeaveSessionMessage()));
+		ret.SetResult(MessageStringResult::MessageStringResult_MessageNotKnown);
+		return ret;
 	}
 	
 

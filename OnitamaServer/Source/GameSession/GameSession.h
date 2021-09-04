@@ -10,8 +10,8 @@ public:
 	GameSession();
 	std::string GetSessionName();
 	void SetSessionName(std::string inSessionName);
-	void SetConnEntityA(std::shared_ptr<ConnEntity> inConnectionEntity);
-	void SetConnEntityB(std::shared_ptr<ConnEntity> inConnectionEntity);
+	void SetConnEntityRed(std::shared_ptr<ConnEntity> inConnectionEntity);
+	void SetConnEntityBlue(std::shared_ptr<ConnEntity> inConnectionEntity);
 	
 	//TODO(Simon): This should be an enum...
 	// -1 ... B wishes to leave the session
@@ -23,8 +23,8 @@ public:
 
 	bool HasTwoPlayer();
 
-	std::shared_ptr<ConnEntity> GetPlayerA();
-	std::shared_ptr<ConnEntity> GetPlayerB();
+	std::shared_ptr<ConnEntity> GetPlayerRed();
+	std::shared_ptr<ConnEntity> GetPlayerBlue();
 
 	// If both _connEntityA and _connEntityB are closed return true
 	bool CheckConnectionsIfClosed();
@@ -38,12 +38,12 @@ private:
 	// Starting player or 
 	// the one taking the seat after this one left without starting
 	// Player Red
-	std::shared_ptr<ConnEntity> _connEntityA;
+	std::shared_ptr<ConnEntity> _connEntityRed;
 
 	// Joining player or 
 	// the one joined last
 	// Player Blue
-	std::shared_ptr<ConnEntity> _connEntityB;
+	std::shared_ptr<ConnEntity> _connEntityBlue;
 
 
 	std::shared_ptr<spdlog::logger> l;

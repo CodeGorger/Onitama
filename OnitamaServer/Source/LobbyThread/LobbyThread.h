@@ -9,6 +9,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <Source/GameThread/GameThread.h>
 
 class LobbyThread :public ThreadHandler
 {
@@ -52,6 +53,8 @@ private:
 	// with closed sockets
 	void _removedClosedConnections();
 
+	void _startStartableGames();
+
 	void _handleOpenSessionTimeout();
 
 	ThreadSafeQueue< std::shared_ptr<ConnEntity>>
@@ -64,7 +67,10 @@ private:
 		_unstartedGameSessionList;
 
 	ThreadSafeQueue< std::shared_ptr<GameSession>>
-		_launchedGameSessionList;
+		_startableGameSessionList;
+
+	ThreadSafeQueue< std::shared_ptr<GameThread>>
+		_startedGamesList;
 
 	std::shared_ptr<spdlog::logger> l;
 };

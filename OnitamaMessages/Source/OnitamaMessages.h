@@ -3,14 +3,14 @@
 
 
 
-#include "Messages/Gameover/GameoverMessage.h"
-#include "Messages/Gamestart/GamestartMessage.h"
-#include "Messages/GamestartRequest/GamestartRequestMessage.h"
-#include "Messages/Greeting/GreetingMessage.h"
-#include "Messages/InvalidMove/InvalidMoveMessage.h"
-#include "Messages/Move/MoveMessage.h"
+#include "Messages/GameoverMessage/GameoverMessage.h"
+#include "Messages/GamestartMessage/GamestartMessage.h"
+#include "Messages/GamestartRequestMessage/GamestartRequestMessage.h"
+#include "Messages/GreetingMessage/GreetingMessage.h"
+#include "Messages/InvalidMoveMessage/InvalidMoveMessage.h"
+#include "Messages/MoveMessage/MoveMessage.h"
 #include "Messages/JoinSessionMessage/JoinSessionMessage.h"
-#include "Messages/SessionList/SessionListMessage.h"
+#include "Messages/SessionListMessage/SessionListMessage.h"
 #include "Messages/OnitamaMessage.h"
 #include "MessageParser.h"
 

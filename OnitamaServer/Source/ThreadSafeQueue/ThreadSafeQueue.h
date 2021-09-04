@@ -36,7 +36,7 @@ public:
 
 private:
     std::shared_ptr<std::vector<T>> _list;
-    std::mutex _mutex;
+    std::shared_ptr<std::mutex> _mutex;
 
 };
 
@@ -45,25 +45,28 @@ template<typename T>
 ThreadSafeQueue<T>::ThreadSafeQueue()
 {
     _list = std::make_shared<std::vector<T>>();
+    _mutex = std::make_shared<std::mutex>();
 }
 
 template<typename T>
 ThreadSafeQueue<T>::ThreadSafeQueue(const ThreadSafeQueue<T>& rhs)
 {
     _list = rhs._list;
+    _mutex = rhs._mutex;
 }
 
 template<typename T>
 ThreadSafeQueue<T>& ThreadSafeQueue<T>::operator= (ThreadSafeQueue<T> rhs)
 {
     _list = rhs._list;
+    _mutex = rhs._mutex;
     return *this;
 }
 
 template<typename T>
 void ThreadSafeQueue<T>::Enque(T inEle)
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     //_list.get().push_back(inEle);
     _list->push_back(inEle);
 }
@@ -72,7 +75,7 @@ void ThreadSafeQueue<T>::Enque(T inEle)
 template<typename T>
 T ThreadSafeQueue<T>::Deque()
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     T ret = (*_list.get())[0];
     _list->erase(_list->begin());
     return ret;
@@ -82,7 +85,7 @@ T ThreadSafeQueue<T>::Deque()
 template<typename T>
 T ThreadSafeQueue<T>::PopBack()
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     return _list->pop_back();
 }
 
@@ -90,7 +93,7 @@ T ThreadSafeQueue<T>::PopBack()
 template<typename T>
 void ThreadSafeQueue<T>::Remove(int i)
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     _list->erase(_list->begin() + i);
 }
 
@@ -98,14 +101,14 @@ void ThreadSafeQueue<T>::Remove(int i)
 template<typename T>
 T ThreadSafeQueue<T>::Get(int i)
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     return (*_list.get())[i];
 }
 
 template<typename T>
 unsigned int ThreadSafeQueue<T>::Size()
 {
-    std::lock_guard<std::mutex> guard(_mutex);
+    std::lock_guard<std::mutex> guard(*_mutex.get());
     return (unsigned int)_list->size();
 }
 

@@ -50,8 +50,21 @@ while not userquit:
         elif sv.GetQuitStatus() == 201:
             # Leave Session
             state = 1
-        elif sv.GetQuitStatus() == 202:
+        elif sv.GetQuitStatus() == 205:
             # Start Session
             state = 3
     elif 3 == state: # ingame
+        gv.SetSocket(dv.GetSocket())
+        gv.SetStartMessage(sv.GetGameStartMessage())
         gv.Display()
+        if gv.GetQuitStatus() == 300:
+            # Closed with X
+            userquit = True
+            print("Close Window X")
+        elif gv.GetQuitStatus() == 201:
+            # Leave Game -> Go back to Lobby
+            state = 1
+            print("Go back to Lobby")
+
+# TODO(Simon): Make the views to states and have this be a statemachine
+# TODO(Simon): What happens when the server crashes / loses connection?

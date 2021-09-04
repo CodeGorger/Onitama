@@ -4,12 +4,13 @@
 #include <iomanip>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "Messages/Greeting/GreetingMessage.h"
-#include "Messages/SessionList/SessionListMessage.h"
+#include "Messages/GreetingMessage/GreetingMessage.h"
+#include "Messages/SessionListMessage/SessionListMessage.h"
 #include "Messages/JoinSessionMessage/JoinSessionMessage.h"
-#include "Messages/SessionInformation/SessionInformationMessage.h"
-#include "Messages/GamestartRequest/GamestartRequestMessage.h"
+#include "Messages/SessionInformationMessage/SessionInformationMessage.h"
+#include "Messages/GamestartRequestMessage/GamestartRequestMessage.h"
 #include "Messages/LeaveSessionMessage/LeaveSessionMessage.h"
+#include "Messages/GamestartMessage/GamestartMessage.h"
 
 
 PYBIND11_MODULE(OnitamaMessages, m)
@@ -86,6 +87,20 @@ PYBIND11_MODULE(OnitamaMessages, m)
 		.def(pybind11::init<>())
 		.def("ParseContent", &LeaveSessionMessage::ParseContent)
 		.def("ToString", &LeaveSessionMessage::ToString);
+
+
+	pybind11::class_<GamestartMessage,
+		std::shared_ptr<GamestartMessage>>(m, "GamestartMessage")
+		.def(pybind11::init<>())
+		.def("ParseContent", &GamestartMessage::ParseContent)
+		.def("ToString", &GamestartMessage::ToString)
+		.def("GetCard1", &GamestartMessage::GetCard1)
+		.def("GetCard2", &GamestartMessage::GetCard2)
+		.def("GetOppoCard1", &GamestartMessage::GetOppoCard1)
+		.def("GetOppoCard2", &GamestartMessage::GetOppoCard2)
+		.def("GetCenterCard", &GamestartMessage::GetCenterCard)
+		.def("GetStartingPlayer", &GamestartMessage::GetStartingPlayer)
+		.def("GetOppoName", &GamestartMessage::GetOppoName);
 
 
 	pybind11::enum_<MessageStringResult>(m, "MessageStringResult")

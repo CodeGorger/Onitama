@@ -8,6 +8,8 @@
 ConnEntity::ConnEntity()
     :_isInitedProperly(false)
 {
+    srand(time(NULL));
+
     std::string randomLoggerId = std::to_string(rand() % 1000000);
     std::string id=
         std::string(6 - randomLoggerId.length(), '0') + randomLoggerId;
@@ -212,7 +214,6 @@ int ConnEntity::ReadStartRequestAndLeaveSessionMessage()
     {
         return -1;
     }
-    return 3;
 }
 
 ReadMoveInfoDto ConnEntity::ReadMoveInfo()

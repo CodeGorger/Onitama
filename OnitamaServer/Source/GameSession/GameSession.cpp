@@ -4,6 +4,8 @@
 
 GameSession::GameSession()
 {
+	srand(time(NULL));
+
 	std::string randomLoggerId = std::to_string(rand() % 1000000);
 	std::string id =
 		std::string(6 - randomLoggerId.length(), '0') + randomLoggerId;
@@ -23,16 +25,16 @@ void GameSession::SetSessionName(std::string inSessionName)
 	_sessionName = inSessionName;
 }
 
-void GameSession::SetConnEntityA(std::shared_ptr<ConnEntity> inConnectionEntity)
+void GameSession::SetConnEntityRed(std::shared_ptr<ConnEntity> inConnectionEntity)
 {
-	l->debug("SetConnEntityA");
-	_connEntityA = inConnectionEntity;
+	l->debug("SetConnEntityRed");
+	_connEntityRed = inConnectionEntity;
 }
 
-void GameSession::SetConnEntityB(std::shared_ptr<ConnEntity> inConnectionEntity)
+void GameSession::SetConnEntityBlue(std::shared_ptr<ConnEntity> inConnectionEntity)
 {
-	l->debug("SetConnEntityB");
-	_connEntityB = inConnectionEntity;
+	l->debug("SetConnEntityBlue");
+	_connEntityBlue = inConnectionEntity;
 }
 
 //TODO(Simon): This should be an enum...
@@ -45,24 +47,24 @@ void GameSession::SetConnEntityB(std::shared_ptr<ConnEntity> inConnectionEntity)
 //  3 ... Error
 int GameSession::ReadStartRequestAndLeaveSessionMessages()
 {
-	if (!_connEntityA && !_connEntityB)
+	if (!_connEntityRed && !_connEntityBlue)
 	{
 		return 1;
 	}
-	if (!_connEntityA)
+	if (!_connEntityRed)
 	{
 		return 2;
 	}
 
 	int a = 1;
 	int b = 1;
-	if (_connEntityA)
+	if (_connEntityRed)
 	{
-		a=_connEntityA->ReadStartRequestAndLeaveSessionMessage();
+		a= _connEntityRed->ReadStartRequestAndLeaveSessionMessage();
 	}
-	if (_connEntityB)
+	if (_connEntityBlue)
 	{
-		b=_connEntityB->ReadStartRequestAndLeaveSessionMessage();
+		b= _connEntityBlue->ReadStartRequestAndLeaveSessionMessage();
 	}
 
 	// Check if they want to leave the session
@@ -95,27 +97,29 @@ bool GameSession::HasTwoPlayer()
 {
 	bool si = false;
 	bool oi = false;
-	if (_connEntityA)
+	if (_connEntityRed)
 	{
-		si = _connEntityA->IsInited();
+		si = _connEntityRed->IsInited();
 	}
-	if (_connEntityB)
+	if (_connEntityBlue)
 	{
-		oi = _connEntityB->IsInited();
+		oi = _connEntityBlue->IsInited();
 	}
 	return (si && oi);
 }
 
 
-std::shared_ptr<ConnEntity> GameSession::GetPlayerA()
+// Returns a smartpointer to the red player.
+std::shared_ptr<ConnEntity> GameSession::GetPlayerRed()
 {
-	return _connEntityA;
+	return _connEntityRed;
 }
 
 
-std::shared_ptr<ConnEntity> GameSession::GetPlayerB()
+// Returns a smartpointer to the blue player.
+std::shared_ptr<ConnEntity> GameSession::GetPlayerBlue()
 {
-	return _connEntityB;
+	return _connEntityBlue;
 }
 
 
@@ -126,15 +130,15 @@ bool GameSession::CheckConnectionsIfClosed()
 	bool a = true;
 	bool b = true;
 
-	if (_connEntityA)
+	if (_connEntityRed)
 	{
-		l->debug("CheckConnectionsIfClosed A");
-		a = _connEntityA->IsClosed();
+		//l->debug("CheckConnectionsIfClosed A");
+		a = _connEntityRed->IsClosed();
 	}
-	if (_connEntityB)
+	if (_connEntityBlue)
 	{
-		l->debug("CheckConnectionsIfClosed B");
-		b = _connEntityB->IsClosed();
+		//l->debug("CheckConnectionsIfClosed B");
+		b = _connEntityBlue->IsClosed();
 	}
 	return a && b;
 }

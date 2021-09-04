@@ -1,17 +1,29 @@
 #include "GameThread.h"
-#include <Messages/Gamestart/GamestartMessage.h>
-#include <Messages/Gameover/GameoverMessage.h>
+#include <Messages/GamestartMessage/GamestartMessage.h>
+#include <Messages/GameoverMessage/GameoverMessage.h>
 #include <Messages/WaitingOtherPlayerMessage/WaitingOtherPlayerMessage.h>
 #include <iostream>
 #include <Messages/TimeoutWarningMessage/TimeoutWarningMessage.h>
-#include <Messages/InvalidMove/InvalidMoveMessage.h>
-#include <Messages/Move/MoveMessage.h>
+#include <Messages/InvalidMoveMessage/InvalidMoveMessage.h>
+#include <Messages/MoveMessage/MoveMessage.h>
 #include "../ConnEntity/ReadMoveInfoDto.h"
 
-GameThread::GameThread(GameSession inGameSession)
+GameThread::GameThread(std::shared_ptr<GameSession> inGameSession)
 	:_sessionInformation(inGameSession)
 	,_turnTimeLimit(40)
+	,_isGameOver(false)
 {
+	srand(time(NULL));
+
+	l = spdlog::stdout_color_mt("GameThread");
+#ifdef DEBUGLOGGING
+	l->set_level(spdlog::level::debug);
+#endif
+
+	l->info("Created GameThread (red: {0}; blue: {1}).",
+		_sessionInformation->GetPlayerRed()->GetPlayername(),
+		_sessionInformation->GetPlayerBlue()->GetPlayername());
+
 	_engine = OnitamaEngine();
 	_sendPlayerACardsState(
 		_engine.GetCurrentCardsRed()[0],
@@ -20,16 +32,27 @@ GameThread::GameThread(GameSession inGameSession)
 		_engine.GetCurrentCardsBlue()[1],
 		_engine.GetCenterCard());
 	_sendPlayerBCardsState(
-		_engine.GetCurrentCardsBlue()[0],
-		_engine.GetCurrentCardsBlue()[1],
 		_engine.GetCurrentCardsRed()[0],
 		_engine.GetCurrentCardsRed()[1],
+		_engine.GetCurrentCardsBlue()[0],
+		_engine.GetCurrentCardsBlue()[1],
 		_engine.GetCenterCard());
+
+	// The first player gets an additional 5s
+	_turnStartTime = clock();
+	if (_turnStartTime >= 5 * CLOCKS_PER_SEC)
+	{
+		_turnStartTime -= 5 * CLOCKS_PER_SEC;
+	}
+	else
+	{
+		_turnStartTime = 0;
+	}
 }
 
 
 void GameThread::SetLobbyConnections(
-	std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>> inLobbyConnections)
+	ThreadSafeQueue<std::shared_ptr<ConnEntity>> inLobbyConnections)
 {
 	_lobbyConnections = inLobbyConnections;
 }
@@ -38,8 +61,10 @@ void GameThread::SetLobbyConnections(
 // This is the entry point of the thread
 void GameThread::_do()
 {
+	l->info("Starting Thread");
 	_timedLoop();
 	_sendPlayersBackToLobby();
+	l->info("Stopping Thread");
 }
 
 
@@ -61,29 +86,36 @@ void GameThread::_sendPlayerACardsState(
 	gsMes.SetCenterCard(inC.GetName());
 
 	gsMes.SetStartingPlayer(inC.IsRedStartPlayer());
-	_sessionInformation.GetPlayerA()->Send(gsMes.ToString());
+	
+
+	//TODO(Simon): Nullptr checking doesn't hurt. 
+	//             This todo applies to here and the entire program.
+	gsMes.SetOppoName(_sessionInformation->GetPlayerBlue()->GetPlayername());
+	_sessionInformation->GetPlayerRed()->Send(gsMes.ToString());
 }
 
 
 void GameThread::_sendPlayerBCardsState(
-	Card inB1,
-	Card inB2,
 	Card inR1,
 	Card inR2,
+	Card inB1,
+	Card inB2,
 	Card inC)
 {
 
 	GamestartMessage gsMes;
 	//gsMes = GamestartMessage();
 
-	gsMes.SetCard1(inR1.GetName());
-	gsMes.SetCard2(inR2.GetName());
-	gsMes.SetOppoCard1(inB1.GetName());
-	gsMes.SetOppoCard2(inB2.GetName());
+	gsMes.SetCard1(inB1.GetName());
+	gsMes.SetCard2(inB2.GetName());
+	gsMes.SetOppoCard1(inR1.GetName());
+	gsMes.SetOppoCard2(inR2.GetName());
 	gsMes.SetCenterCard(inC.GetName());
 
 	gsMes.SetStartingPlayer(!inC.IsRedStartPlayer());
-	_sessionInformation.GetPlayerB()->Send(gsMes.ToString());
+
+	gsMes.SetOppoName(_sessionInformation->GetPlayerRed()->GetPlayername());
+	_sessionInformation->GetPlayerBlue()->Send(gsMes.ToString());
 }
 
 // Will execute _timedDo() maximally 1 each second
@@ -110,13 +142,20 @@ void GameThread::_timedLoop()
 
 		if (loopDurationInMs > 1000)
 		{
-			std::cout << "Loop stalled: " << 
-				loopDurationInMs << " ms" << std::endl;
+			l->info("Loop stalled: {0} ms", loopDurationInMs);
 		}
 		else
 		{
 			Sleep(1000 - loopDurationInMs);
 		}
+	}
+	if (_isGameOver)
+	{
+		l->info("Game is over.");
+	}
+	if (_isShutdownRequested)
+	{
+		l->info("Shutdown is requested.");
 	}
 }
 
@@ -124,9 +163,16 @@ void GameThread::_timedLoop()
 // Will execute _timedDo() maximally 1 each second
 void GameThread::_timedDo()
 {
+	l->debug("_sendUnactivePlayerNotification");
 	_sendUnactivePlayerNotification();
+
+	l->debug("_sendActivePlayerTimeoutWarning");
 	_sendActivePlayerTimeoutWarning();
+
+	l->debug("_processActivePlayer");
 	_processActivePlayer();
+
+	l->debug("_checkForGameover");
 	_checkForGameover();
 }
 
@@ -137,20 +183,26 @@ void GameThread::_processActivePlayer()
 	ReadMoveInfoDto rmid;
 	if (_redsTurn)
 	{
-		rmid = _sessionInformation.GetPlayerA()->ReadMoveInfo();
+		l->debug("Reds turn");
+		rmid = _sessionInformation->GetPlayerRed()->ReadMoveInfo();
 	}
 	else
 	{
-		rmid = _sessionInformation.GetPlayerB()->ReadMoveInfo();
+		l->debug("Blues turn");
+		rmid = _sessionInformation->GetPlayerBlue()->ReadMoveInfo();
 	}
 
 	if (0 != rmid.GetReturnStatus())
 	{
+		l->debug("No move information received.");
 		return;
 	}
+	l->debug("Move information received.");
 
 	if (!_engine.ValidateMove(_redsTurn, rmid.GetMoveInfo()))
 	{
+		l->debug("Invalid move.");
+
 		std::string invalidMoveReason = _engine.GetEngineStatus();
 		_sendActivePlayerInvalidMove(
 			invalidMoveReason, 
@@ -158,6 +210,7 @@ void GameThread::_processActivePlayer()
 		_turnStartTime = clock();
 		return;
 	}
+	l->debug("Valid move.");
 	
 	_sendUnactivePlayerMoveInformation(rmid.GetMoveInfo().ToString());
 	_engine.ApplyMove(rmid.GetMoveInfo().ToString());
@@ -167,14 +220,45 @@ void GameThread::_processActivePlayer()
 
 void GameThread::_checkForGameover()
 {
+	int timeSinceTurnStart = ((clock() - _turnStartTime) / CLOCKS_PER_SEC);
 	bool isTurnTimeout = 
-		_turnTimeLimit < ((clock() - _turnStartTime) / CLOCKS_PER_SEC);
+		_turnTimeLimit < timeSinceTurnStart;
+	if (isTurnTimeout)
+	{
+		l->info(
+			"Turn timeout. Time limit: {0}s; Time since turn start: {1}s",
+			_turnTimeLimit, 
+			timeSinceTurnStart);
+	}
+	else
+	{
+		l->debug(
+			"Turn timeout. Time limit: {0}s; Time since turn start: {1}s",
+			_turnTimeLimit,
+			timeSinceTurnStart);
+	}
+
 
 	//TODO(Simon): Accumulate time somewhere and check here
 	bool isGameTimeout = false;
+	if (isGameTimeout)
+	{
+		l->debug("isGameTimeout");
+	}
+
 
 	//TODO(Simon): Check if one is disconnected and inform the other
 	bool isDisconnected = false;
+	if (isGameTimeout)
+	{
+		l->debug("isDisconnected");
+	}
+
+
+	if (_engine.IsGameOver())
+	{
+		l->debug("Gameover by engine.");
+	}
 	
 	if (_engine.IsGameOver() ||
 		isGameTimeout ||
@@ -198,17 +282,28 @@ void GameThread::_sendUnactivePlayerNotification()
 	wopMes.SetTimeLeftInS(timeLeftInSecs);
 	if (_redsTurn)
 	{
-		_sessionInformation.GetPlayerB()->Send(wopMes.ToString());
+		_sessionInformation->GetPlayerBlue()->Send(wopMes.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA()->Send(wopMes.ToString());
+		_sessionInformation->GetPlayerRed()->Send(wopMes.ToString());
 	}
 }
 
 void GameThread::_sendActivePlayerTimeoutWarning()
 {
 	TimeoutWarningMessage toMes = TimeoutWarningMessage();
+	toMes.SetTurnTimeLimitInS(_turnTimeLimit);
+	int timeLeftInSecs = (clock() - _turnStartTime) / CLOCKS_PER_SEC;
+	toMes.SetTurnTimeLeftInS(timeLeftInSecs);
+	if (_redsTurn)
+	{
+		_sessionInformation->GetPlayerRed()->Send(toMes.ToString());
+	}
+	else
+	{
+		_sessionInformation->GetPlayerBlue()->Send(toMes.ToString());
+	}
 }
 
 void GameThread::_sendActivePlayerInvalidMove(
@@ -228,11 +323,11 @@ void GameThread::_sendUnactivePlayerMoveInformation(
 
 	if (_redsTurn)
 	{
-		_sessionInformation.GetPlayerB()->Send(mMes.ToString());
+		_sessionInformation->GetPlayerBlue()->Send(mMes.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA()->Send(mMes.ToString());
+		_sessionInformation->GetPlayerRed()->Send(mMes.ToString());
 	}
 }
 
@@ -286,19 +381,19 @@ void GameThread::_sendGameoverMessageToBothPlayers(
 
 	if (_engine.HasRedLost())
 	{
-		_sessionInformation.GetPlayerA()->Send(goMesWin.ToString());
-		_sessionInformation.GetPlayerB()->Send(goMesLoss.ToString());
+		_sessionInformation->GetPlayerRed()->Send(goMesWin.ToString());
+		_sessionInformation->GetPlayerBlue()->Send(goMesLoss.ToString());
 	}
 	else
 	{
-		_sessionInformation.GetPlayerA()->Send(goMesLoss.ToString());
-		_sessionInformation.GetPlayerB()->Send(goMesWin.ToString());
+		_sessionInformation->GetPlayerRed()->Send(goMesLoss.ToString());
+		_sessionInformation->GetPlayerBlue()->Send(goMesWin.ToString());
 	}
 }
 
 void GameThread::_sendPlayersBackToLobby()
 {
-	_lobbyConnections->push_back(_sessionInformation.GetPlayerA());
-	_lobbyConnections->push_back(_sessionInformation.GetPlayerB());
+	_lobbyConnections.Enque(_sessionInformation->GetPlayerRed());
+	_lobbyConnections.Enque(_sessionInformation->GetPlayerBlue());
 }
 

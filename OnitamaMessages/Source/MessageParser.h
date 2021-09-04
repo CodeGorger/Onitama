@@ -12,6 +12,7 @@ enum class MessageStringResult
 	MessageStringResult_Trash,
 	MessageStringResult_PossibleBeginning,
 	MessageStringResult_TooLongNotComplete,
+	MessageStringResult_MessageNotKnown,
 	MessageStringResult_NotInited
 };
 

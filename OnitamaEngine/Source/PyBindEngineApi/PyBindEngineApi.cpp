@@ -22,7 +22,11 @@ PYBIND11_MODULE(OnitamaEngine, m)
 		.def("PrintBoardAndAxes", &OnitamaEngine::PrintBoardAndAxes)
 		.def("GetCurrentCardsRed", &OnitamaEngine::GetCurrentCardsRed)
 		.def("GetCurrentCardsBlue", &OnitamaEngine::GetCurrentCardsBlue)
-		.def("GetCenterCard", &OnitamaEngine::GetCenterCard);
+		.def("GetCenterCard", &OnitamaEngine::GetCenterCard)
+		.def("SetCurrentCardsRed", &OnitamaEngine::SetCurrentCardsRed)
+		.def("SetCurrentCardsBlue", &OnitamaEngine::SetCurrentCardsBlue)
+		.def("SetCurrentCardCenter", &OnitamaEngine::SetCurrentCardCenter);
+
 		//.def("GetAllPossibleMoves", &OnitamaEngine::GetAllPossibleMoves);
 
 

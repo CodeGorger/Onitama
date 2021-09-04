@@ -76,8 +76,8 @@ class LobbyView:
             # First potential readable message
             MessageDto = OnitamaMessages.ParseMessage(self._allIncomingTcpData)
             parseSuccess = MessageDto.GetResult()
-            #print("parseSuccess: ", parseSuccess)
-            #print("_allIncomingTcpData: ", self._allIncomingTcpData)
+            # print("parseSuccess: ", parseSuccess)
+            # print("_allIncomingTcpData: ", self._allIncomingTcpData)
             while OnitamaMessages.MessageStringResult_Complete == parseSuccess:
                 print("Parsed message successfully")
 
@@ -114,8 +114,8 @@ class LobbyView:
         else:
             self._sessionName.set("")
 
-        #self._entrySessionName.delete(0, END)
-        #self._entrySessionName.insert(END, self._sessionName)
+        # self._entrySessionName.delete(0, END)
+        # self._entrySessionName.insert(END, self._sessionName)
 
     def Display(self):
         self._isClosing = False

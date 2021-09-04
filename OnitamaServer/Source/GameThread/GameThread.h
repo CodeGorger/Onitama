@@ -4,18 +4,18 @@
 #include <OnitamaEngine/OnitamaEngine.h>
 #include "../GameSession/GameSession.h"
 #include "../Thread/ThreadHandler.h"
-
+#include "../ThreadSafeQueue/ThreadSafeQueue.h"
 
 class GameThread :public ThreadHandler
 {
 public:
-	GameThread(GameSession inGameSession);
+	GameThread(std::shared_ptr<GameSession> inGameSession);
 	void SetLobbyConnections(
-		std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>> inLobbyConnections);
+		ThreadSafeQueue<std::shared_ptr<ConnEntity>> inLobbyConnections);
 
 private:
 	void _do();
-	GameSession _sessionInformation;
+	std::shared_ptr<GameSession> _sessionInformation;
 	OnitamaEngine _engine;
 
 	// Local instance that signals a game is over
@@ -31,9 +31,12 @@ private:
 	// required to determine timeouts
 	int _turnStartTime;
 
-	std::shared_ptr<std::vector<std::shared_ptr<ConnEntity>>>
+	ThreadSafeQueue<std::shared_ptr<ConnEntity>>
 		_lobbyConnections;
 
+	// Will send player A a GameStartMessage
+	// Takes the (freshly) generated card information
+	// (reds(A) cards1&2; blues(B) cards1&2; and the center cards)
 	void _sendPlayerACardsState(
 		Card inR1,
 		Card inR2,
@@ -41,6 +44,9 @@ private:
 		Card inB2,
 		Card inC);
 
+	// Will send player B a GameStartMessage
+	// Takes the (freshly) generated card information
+	// (reds(A) cards1&2; blues(B) cards1&2; and the center cards)
 	void _sendPlayerBCardsState(
 		Card inR1,
 		Card inR2,
@@ -74,6 +80,8 @@ private:
 
 	void _sendPlayersBackToLobby();
 	void _terminate();
+
+	std::shared_ptr<spdlog::logger> l;
 };
 
 

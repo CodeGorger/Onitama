@@ -35,11 +35,10 @@ CutParameterDto OnitamaMessage::CutNextParameter(std::string inMessageContent)
 	return ret;
 }
 
-
-
-
-
-
+std::shared_ptr<OnitamaMessage> OnitamaMessage::CreateSelf()
+{
+	exit(-100);
+}
 
 
 

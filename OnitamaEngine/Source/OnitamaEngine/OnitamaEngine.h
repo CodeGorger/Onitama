@@ -38,6 +38,7 @@ private:
     // _currentCardCenter is the card that lays in the center
     Card _currentCardCenter;
 
+    //TODO(Simon): Make this to a map!
     // _allCards contains all available cards.
     std::vector<Card> _allCards;
 
@@ -61,8 +62,15 @@ private:
     bool _foundBlueMaster();
     bool _foundRedMaster();
 
+    Card _getCard(std::string inCardName);
+
+
 public:
     std::string GetEngineStatus();
+
+    void SetCurrentCardsRed(std::string inCard1, std::string inCard2);
+    void SetCurrentCardsBlue(std::string inCard1, std::string inCard2);
+    void SetCurrentCardCenter(std::string inCard);
 
     // _validateMove will return true if the given parameter
     // for a move is legal, else false

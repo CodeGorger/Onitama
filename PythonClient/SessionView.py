@@ -12,7 +12,6 @@ class SessionView:
         self._quitStatus = 200
         self._username = ""
         self._sessionname = ""
-        # self._oppoName = "Unknown Oppo Name"
         self._allIncomingTcpData = ""
         self._isClosing = False
 
@@ -36,7 +35,10 @@ class SessionView:
             # print('{0}. err: {1}'.format(i, err))
         return ret
 
-    def _processingSessionInfoMsg(self):
+    def GetGameStartMessage(self):
+        return self._gameStartMessage
+
+    def _processingIncomingMessages(self):
         while not self._isClosing:
             print("Processing session info message")
             self._allIncomingTcpData = \
@@ -67,8 +69,15 @@ class SessionView:
                         self._infoMessage.set("You are the guest.")
                         self._buttonStart.place_forget()
 
+                # It was a start game message, another one we need here
+                # process it ...
+                if OnitamaMessages.GamestartMessage == type(MsgObject):
+                    self._gameStartMessage = MsgObject
+                    self._quitStatus = 205
+                    self._tkOnitamaClientWindow.destroy()
+
                 del MsgObject
-                print(self._allIncomingTcpData)
+                # print(self._allIncomingTcpData)
 
                 # See if there are further messages in the string to be processed
                 MessageDto = OnitamaMessages.ParseMessage(self._allIncomingTcpData)
@@ -107,11 +116,11 @@ class SessionView:
         if msgLength != sentLength:
             print("Sent only {0} chars of message {1}. Aborting...".
                   format(sentLength, GamestartRequestM.ToString()))
-            self._quitStatus = 204
+        #     self._quitStatus = 204
         else:
             print("Sent start session message '{0}'.".format(GamestartRequestM.ToString()))
-            self._quitStatus = 202
-        self._tkOnitamaClientWindow.destroy()
+        #     self._quitStatus = 202
+        # self._tkOnitamaClientWindow.destroy()
 
     def GetQuitStatus(self):
         return self._quitStatus
@@ -165,7 +174,7 @@ class SessionView:
         self._buttonStart.place(x=275, y=80, width=120, height=20)
         self._buttonStart.pack_forget()
 
-        self._sessionInfoThread = threading.Thread(target=self._processingSessionInfoMsg)
+        self._sessionInfoThread = threading.Thread(target=self._processingIncomingMessages)
         self._sessionInfoThread.start()
 
         self._tkOnitamaClientWindow.mainloop()

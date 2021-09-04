@@ -1,5 +1,9 @@
 #include "WaitingOtherPlayerMessage.h"
 
+StaticOnitamaMessageCtor WaitingOtherPlayerMessage::_staticCtor =
+StaticOnitamaMessageCtor(std::string("WaitingOtherPlayer"), WaitingOtherPlayerMessage::CreateSelf);
+
+
 WaitingOtherPlayerMessage::WaitingOtherPlayerMessage()
 	:OnitamaMessage("WaitingOtherPlayer", 40)
 	, _totalLimitInS(60)
@@ -37,6 +41,13 @@ std::string WaitingOtherPlayerMessage::ToString()
 	return ret;
 }
 
+std::shared_ptr<OnitamaMessage> WaitingOtherPlayerMessage::CreateSelf()
+{
+	return std::make_shared<WaitingOtherPlayerMessage>();
+}
+
+
+
 
 void WaitingOtherPlayerMessage::SetTimeLimitInS(int inTotalLimit)
 {
@@ -49,4 +60,8 @@ void WaitingOtherPlayerMessage::SetTimeLeftInS(int inTimeLeft)
 	_timeLeftInS = inTimeLeft;
 }
 
+int WaitingOtherPlayerMessage::GetTimeLeftInS()
+{
+	return _timeLeftInS;
+}
 

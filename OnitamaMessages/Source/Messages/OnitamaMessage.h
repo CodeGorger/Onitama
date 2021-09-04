@@ -3,8 +3,11 @@
 
 #include <string>
 #include "CutParameterDto.h"
+#include "StaticOnitamaMessageCtor.h"
 
-class OnitamaMessage //: public std::enable_shared_from_this<OnitamaMessage>
+
+
+class OnitamaMessage
 {
 public:
 	OnitamaMessage(std::string inMessageName, unsigned int inMaxLegalLength);
@@ -23,11 +26,18 @@ protected:
 	CutParameterDto CutNextParameter(std::string inMessageContent);
 	std::string _messageName;
 
+	static std::shared_ptr<OnitamaMessage> CreateSelf();
+
+
 private:
 	unsigned int _maxLegalLength;
 
 	int _length;
 	std::string _messageInformation;
+
+
 };
+
+
 
 #endif

@@ -7,10 +7,13 @@ class LeaveSessionMessage :public OnitamaMessage
 {
 public:
 	LeaveSessionMessage();
-	void ParseContent(std::string inMessageContent);
-	std::string ToString();
+	virtual void ParseContent(std::string inMessageContent);
+	virtual std::string ToString();
+	static std::shared_ptr<OnitamaMessage> CreateSelf();
 
 private:
+	static StaticOnitamaMessageCtor _staticCtor;
+
 };
 
 #endif

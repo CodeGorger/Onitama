@@ -161,10 +161,12 @@
     <PostBuildEvent>
       <Command>call "$(SolutionDir)OnitamaMessages\postbuild.bat"</Command>
     </PostBuildEvent>
+    <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.cpp" />
-    <ClCompile Include="Source\Messages\SessionInformation\SessionInformationMessage.cpp" />
+    <ClCompile Include="Source\Messages\SessionInformationMessage\SessionInformationMessage.cpp" />
+    <ClCompile Include="Source\Messages\StaticOnitamaMessageCtor.cpp" />
     <ClCompile Include="Source\PyBindMessagesApi.cpp" />
     <ClCompile Include="Source\MessageParser.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -173,32 +175,33 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\Messages\CutParameterDto.cpp" />
-    <ClCompile Include="Source\Messages\Gameover\GameoverMessage.cpp" />
-    <ClCompile Include="Source\Messages\GamestartRequest\GamestartRequestMessage.cpp" />
-    <ClCompile Include="Source\Messages\Gamestart\GamestartMessage.cpp" />
-    <ClCompile Include="Source\Messages\Greeting\GreetingMessage.cpp" />
-    <ClCompile Include="Source\Messages\InvalidMove\InvalidMoveMessage.cpp" />
+    <ClCompile Include="Source\Messages\GameoverMessage\GameoverMessage.cpp" />
+    <ClCompile Include="Source\Messages\GamestartRequestMessage\GamestartRequestMessage.cpp" />
+    <ClCompile Include="Source\Messages\GamestartMessage\GamestartMessage.cpp" />
+    <ClCompile Include="Source\Messages\GreetingMessage\GreetingMessage.cpp" />
+    <ClCompile Include="Source\Messages\InvalidMoveMessage\InvalidMoveMessage.cpp" />
     <ClCompile Include="Source\Messages\JoinSessionMessage\JoinSessionMessage.cpp" />
-    <ClCompile Include="Source\Messages\Move\MoveMessage.cpp" />
+    <ClCompile Include="Source\Messages\MoveMessage\MoveMessage.cpp" />
     <ClCompile Include="Source\Messages\OnitamaMessage.cpp" />
-    <ClCompile Include="Source\Messages\SessionList\SessionListMessage.cpp" />
+    <ClCompile Include="Source\Messages\SessionListMessage\SessionListMessage.cpp" />
     <ClCompile Include="Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.cpp" />
     <ClCompile Include="Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\MessageParser.h" />
     <ClInclude Include="Source\Messages\CutParameterDto.h" />
-    <ClInclude Include="Source\Messages\Gameover\GameoverMessage.h" />
-    <ClInclude Include="Source\Messages\GamestartRequest\GamestartRequestMessage.h" />
-    <ClInclude Include="Source\Messages\Gamestart\GamestartMessage.h" />
-    <ClInclude Include="Source\Messages\Greeting\GreetingMessage.h" />
-    <ClInclude Include="Source\Messages\InvalidMove\InvalidMoveMessage.h" />
+    <ClInclude Include="Source\Messages\GameoverMessage\GameoverMessage.h" />
+    <ClInclude Include="Source\Messages\GamestartRequestMessage\GamestartRequestMessage.h" />
+    <ClInclude Include="Source\Messages\GamestartMessage\GamestartMessage.h" />
+    <ClInclude Include="Source\Messages\GreetingMessage\GreetingMessage.h" />
+    <ClInclude Include="Source\Messages\InvalidMoveMessage\InvalidMoveMessage.h" />
     <ClInclude Include="Source\Messages\JoinSessionMessage\JoinSessionMessage.h" />
     <ClInclude Include="Source\Messages\LeaveSessionMessage\LeaveSessionMessage.h" />
-    <ClInclude Include="Source\Messages\Move\MoveMessage.h" />
+    <ClInclude Include="Source\Messages\MoveMessage\MoveMessage.h" />
     <ClInclude Include="Source\Messages\OnitamaMessage.h" />
-    <ClInclude Include="Source\Messages\SessionInformation\SessionInformationMessage.h" />
-    <ClInclude Include="Source\Messages\SessionList\SessionListMessage.h" />
+    <ClInclude Include="Source\Messages\SessionInformationMessage\SessionInformationMessage.h" />
+    <ClInclude Include="Source\Messages\SessionListMessage\SessionListMessage.h" />
+    <ClInclude Include="Source\Messages\StaticOnitamaMessageCtor.h" />
     <ClInclude Include="Source\Messages\TimeoutWarningMessage\TimeoutWarningMessage.h" />
     <ClInclude Include="Source\Messages\WaitingOtherPlayerMessage\WaitingOtherPlayerMessage.h" />
     <ClInclude Include="Source\OnitamaMessages.h" />

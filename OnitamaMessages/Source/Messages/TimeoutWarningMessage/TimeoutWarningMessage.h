@@ -7,14 +7,17 @@ class TimeoutWarningMessage :public OnitamaMessage
 {
 public:
 	TimeoutWarningMessage();
-
 	virtual void ParseContent(std::string inMessageContent);
-
-	std::string ToString();
+	virtual std::string ToString();
+	static std::shared_ptr<OnitamaMessage> CreateSelf();
 
 	void SetTurnTimeLeftInS(int inTurnTimeLeftInS)
 	{
 		_turnTimeLeftInS = inTurnTimeLeftInS;
+	}
+	int GetTurnTimeLeftInS()
+	{
+		return _turnTimeLeftInS;
 	}
 	void SetTurnTimeLimitInS(int inTurnTimeLimitInS)
 	{
@@ -30,6 +33,8 @@ public:
 	}
 
 private:
+	static StaticOnitamaMessageCtor _staticCtor;
+
 	int _turnTimeLeftInS;
 	int _turnTimeLimitInS;
 	int _gameTimeLeftInS;
